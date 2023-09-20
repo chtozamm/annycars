@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import Cars from "./cars";
 
 import { prisma } from "../../prisma";
+export const revalidate = 1;
 
 export default async function Home() {
   const cars = (await prisma.cars.findMany()) || [];
