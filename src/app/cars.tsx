@@ -1,23 +1,25 @@
 "use client";
 
-export default function Cars({
-  cars,
-  deleteCar,
-}: {
-  cars: Car[];
-  deleteCar: Function;
-}) {
+import Image from "next/image";
+
+export default function Cars({ cars }: { cars: any }) {
   return (
     <ul>
-      {cars.map((car) => (
-        <li key={car.id} className="grid grid-cols-3">
-          {/* <input
-            type="checkbox"
-            checked={car.isDone}
-            onChange={() => togglecar(car.id, !car.isDone)}
-          /> */}
-          {car.name}
-          <button onClick={() => deleteCar(car.id)}>Delete</button>
+      {cars?.map((car: any) => (
+        <li key={car.id} className="flex flex-col gap-3">
+          <Image
+            src={car.image}
+            width={300}
+            height={300}
+            className="object-cover"
+            alt=""
+          />
+          <p>{car.name}</p>
+          <p>{car.year}</p>
+          <p>{car.place}</p>
+          <p>{car.offer_link}</p>
+          <p>{car.advantages}</p>
+          <p>{car.disadvantages}</p>
         </li>
       ))}
     </ul>
