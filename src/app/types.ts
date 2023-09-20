@@ -1,5 +1,11 @@
 type Car = {
-  id: number;
-  createdAt: Date;
+  id: bigint;
+  created_at: Date;
   name: string;
+  year: string | null;
+  location: string | null;
+  offer_link: string | null;
+  advantages: string | null;
+  disadvantages: string | null;
+  image: string | null;
 };
