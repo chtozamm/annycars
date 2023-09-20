@@ -8,4 +8,5 @@ type Car = {
   advantages: string | null;
   disadvantages: string | null;
   image: string | null;
+  mileage: string | null;
 };

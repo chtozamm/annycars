@@ -19,4 +19,5 @@ model cars {
   disadvantages String?  @default("")
   image         String?  @default("")
   price         String?
+  mileage       String?
 }
