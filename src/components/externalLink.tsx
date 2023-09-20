@@ -19,9 +19,8 @@ export default function ExternalLink({ url }: { url: string }) {
     <AlertDialog>
       <AlertDialogTrigger className="ml-auto w-fit text-zinc-500 transition-colors duration-150 ease-in-out hover:text-zinc-700 focus-visible:text-zinc-700 focus-visible:outline-none">
         <span className="flex items-center gap-1 text-sm text-blue-400">
-          {url.includes("auto.ru")
-            ? "auto.ru"
-            : url.includes("avito.ru" ? "avito.ru" : "ссылка")}
+          {url.includes("auto.ru") && "auto.ru"}
+          {url.includes("avito.ru") && "avito.ru"}
           <ExternalLinkIcon className="h-3 w-3" />
         </span>
       </AlertDialogTrigger>
