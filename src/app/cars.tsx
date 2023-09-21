@@ -17,7 +17,8 @@ import { Input } from "@/components/ui/input";
 export default function Cars({ data }: { data: any }) {
   const [cars, setCars] = useState(data);
   const [inputState, setInputState] = useState("");
-  const [selectState, setSelectState] = useState("Все салоны");
+  const [filterState, setFilterState] = useState("Все салоны");
+  const [sortState, setSortState] = useState("по дате добавления");
   const [isLoading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
   return (
@@ -30,7 +31,7 @@ export default function Cars({ data }: { data: any }) {
           ref={searchRef}
           onChange={(e) => {
             setInputState(e.target.value);
-            if (selectState === "Все салоны") {
+            if (filterState === "Все салоны") {
               const filtered = [...data].filter((car: Car) =>
                 car.name.toLowerCase().includes(e.target.value.toLowerCase()),
               );
@@ -41,7 +42,7 @@ export default function Cars({ data }: { data: any }) {
                   car.name
                     .toLowerCase()
                     .includes(e.target.value.toLowerCase()) &&
-                  car.location === selectState,
+                  car.location === filterState,
               );
               setCars(filtered);
             }
@@ -69,11 +70,11 @@ export default function Cars({ data }: { data: any }) {
             onClick={() => {
               searchRef!.current!.value = "";
               setInputState("");
-              if (selectState === "Все салоны") {
+              if (filterState === "Все салоны") {
                 setCars(data);
               } else {
                 setCars(
-                  [...data].filter((car: Car) => car.location === selectState),
+                  [...data].filter((car: Car) => car.location === filterState),
                 );
               }
             }}
@@ -97,22 +98,76 @@ export default function Cars({ data }: { data: any }) {
           </button>
         )}
       </div>
+      {/* Filter */}
       <Select
         onValueChange={(value) => {
           if (value === "Все салоны") {
-            setSelectState("Все салоны");
+            setFilterState("Все салоны");
             const filtered = [...data].filter((car: Car) =>
               car.name.toLowerCase().includes(inputState.toLowerCase()),
             );
             setCars(filtered);
           } else {
-            setSelectState(value);
+            setFilterState(value);
             const filtered = [...data].filter(
               (car: Car) =>
                 car.location === value &&
                 car.name.toLowerCase().includes(inputState.toLowerCase()),
             );
             setCars(filtered);
+          }
+        }}
+      >
+        <SelectTrigger className="relative mb-3 w-full max-w-md pl-9">
+          <svg
+            className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
+            data-testid="geist-icon"
+            fill="none"
+            height="24"
+            shape-rendering="geometricPrecision"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.6"
+            viewBox="0 0 24 24"
+            width="24"
+          >
+            <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+          </svg>
+          <SelectValue
+            placeholder="Выбрать магазин"
+            className="placeholder:text-gray-400"
+          />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Все салоны">Все салоны</SelectItem>
+          {data.map(
+            (car: Car) =>
+              car.location && (
+                <SelectItem key={car.id} value={car.location}>
+                  {car.location}
+                </SelectItem>
+              ),
+          )}
+        </SelectContent>
+      </Select>
+      {/* Sort */}
+      <Select
+        onValueChange={(value) => {
+          if (value === "по дате добавления") {
+            setSortState("по дате добавления");
+            const filtered = [...data].filter((car: Car) =>
+              car.name.toLowerCase().includes(inputState.toLowerCase()),
+            );
+            setCars(filtered);
+          } else {
+            setSortState(value);
+            // const filtered = [...data].filter(
+            //   (car: Car) =>
+            //     car.location === value &&
+            //     car.name.toLowerCase().includes(inputState.toLowerCase()),
+            // );
+            // setCars(filtered);
           }
         }}
       >
@@ -132,18 +187,16 @@ export default function Cars({ data }: { data: any }) {
           >
             <path d="M15 18H3M21 6H3M17 12H3" />
           </svg>
-          <SelectValue placeholder="Сортировать по компании" />
+          <SelectValue
+            placeholder="Сортировать по"
+            className="placeholder:text-gray-400"
+          />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="Все салоны">Все салоны</SelectItem>
-          {data.map(
-            (car: Car) =>
-              car.location && (
-                <SelectItem key={car.id} value={car.location}>
-                  {car.location}
-                </SelectItem>
-              ),
-          )}
+          <SelectItem value="по дате добавления">по дате добавления</SelectItem>
+          <SelectItem value="по году выпуска">по году выпуска</SelectItem>
+          <SelectItem value="по пробегу">по пробегу</SelectItem>
+          <SelectItem value="по цене">по цене</SelectItem>
         </SelectContent>
       </Select>
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
