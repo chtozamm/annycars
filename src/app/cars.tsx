@@ -18,7 +18,7 @@ export default function Cars({ data }: { data: any }) {
   const [cars, setCars] = useState(data);
   const [location, setLocation] = useState("");
   const [isLoading, setLoading] = useState(true);
-  const searchRef = useRef(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   return (
     <>
       <div className="relative h-fit w-full max-w-md">
