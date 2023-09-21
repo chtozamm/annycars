@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 
 export default function Cars({ data }: { data: any }) {
   const [cars, setCars] = useState(data);
-  // const [location, setLocation] = useState("");
   const [inputState, setInputState] = useState("");
   const [selectState, setSelectState] = useState("Все салоны");
   const [isLoading, setLoading] = useState(true);
@@ -27,7 +26,7 @@ export default function Cars({ data }: { data: any }) {
         <Input
           type="text"
           placeholder="Поиск по названию"
-          className="mb-3 w-full max-w-md"
+          className="mb-3 w-full max-w-md pl-9"
           ref={searchRef}
           onChange={(e) => {
             setInputState(e.target.value);
@@ -48,6 +47,22 @@ export default function Cars({ data }: { data: any }) {
             }
           }}
         />
+        <svg
+          data-testid="geist-icon"
+          fill="none"
+          height="24"
+          shape-rendering="geometricPrecision"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.6"
+          viewBox="0 0 24 24"
+          width="24"
+          className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
+        >
+          <path d="M11 17.25a6.25 6.25 0 110-12.5 6.25 6.25 0 010 12.5z" />
+          <path d="M16 16l4.5 4.5" />
+        </svg>
         {searchRef?.current?.value && (
           <button
             className="absolute right-3 top-3 text-gray-500"
@@ -61,15 +76,6 @@ export default function Cars({ data }: { data: any }) {
                   [...data].filter((car: Car) => car.location === selectState),
                 );
               }
-              // if (location === "") {
-              //   setCars(data);
-              // } else {
-              //   const filtered = [...data].filter(
-              //     (car: Car) => car.location === location,
-              //   );
-              //   setCars(filtered);
-              //   setLocation(location);
-              // }
             }}
           >
             <svg
@@ -110,7 +116,22 @@ export default function Cars({ data }: { data: any }) {
           }
         }}
       >
-        <SelectTrigger className="mb-6 w-full max-w-md">
+        <SelectTrigger className="relative mb-6 w-full max-w-md pl-9">
+          <svg
+            className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
+            data-testid="geist-icon"
+            fill="none"
+            height="24"
+            shape-rendering="geometricPrecision"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.6"
+            viewBox="0 0 24 24"
+            width="24"
+          >
+            <path d="M15 18H3M21 6H3M17 12H3" />
+          </svg>
           <SelectValue placeholder="Сортировать по компании" />
         </SelectTrigger>
         <SelectContent>
@@ -141,7 +162,6 @@ export default function Cars({ data }: { data: any }) {
             </div>
             <p className="flex items-end justify-between text-xl font-semibold">
               {car.name}, {car.year}
-              {/* {car.offer_link && <ExternalLink url={car.offer_link} />} */}
             </p>
             <p className="mb-1 w-full border-b pb-1"></p>
             <p className="flex items-center justify-between text-lg">
@@ -149,15 +169,7 @@ export default function Cars({ data }: { data: any }) {
               <span className="text-sm font-light">
                 Mileage: {car.mileage} km
               </span>
-
-              {/* {car.location && (
-                <span className="ml-auto flex items-center gap-1 text-sm text-gray-500">
-                  {car.location}
-                  <PersonIcon className="mt-0.5 h-3 w-3" />
-                </span>
-              )} */}
             </p>
-            {/* <p className="mt-6">Mileage: {car.mileage} km</p> */}
             <div className="mt-6 flex flex-col gap-3">
               {/* Advantages */}
               <div className="grid grid-cols-2">
