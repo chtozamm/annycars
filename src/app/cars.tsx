@@ -149,7 +149,7 @@ export default function Cars({ data }: { data: any }) {
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
         {cars?.map((car: any) => (
           <li key={car.id} className="flex w-full flex-col border-b pb-3">
-            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm transition-all duration-300 md:h-72 md:w-96">
+            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm md:h-72 md:w-96">
               <Image
                 src={car.image}
                 fill
