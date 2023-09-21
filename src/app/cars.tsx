@@ -241,7 +241,7 @@ export default function Cars({ data }: { data: any }) {
           <SelectItem value="price">по цене</SelectItem>
         </SelectContent>
       </Select>
-      {/* <Button
+      <Button
         className="mb-6 w-full max-w-md"
         onClick={() => {
           setInputState("");
@@ -252,7 +252,7 @@ export default function Cars({ data }: { data: any }) {
         }}
       >
         Сбросить фильтры
-      </Button> */}
+      </Button>
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
         {cars?.map((car: any) => (
           <li key={car.id} className="flex w-full flex-col border-b pb-3">
