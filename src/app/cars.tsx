@@ -274,7 +274,7 @@ export default function Cars({ data }: { data: any }) {
             <p className="flex items-center justify-between text-lg">
               {car.price && car.price + " ₽"}
               <span className="text-sm font-light">
-                Mileage: {car.mileage} km
+                Пробег: {car.mileage} км
               </span>
             </p>
             <div className="mt-6 flex flex-col gap-3">
@@ -282,7 +282,7 @@ export default function Cars({ data }: { data: any }) {
               <div className="grid grid-cols-2">
                 <div>
                   <span className="mx-auto mb-1 inline-block w-fit text-base font-medium">
-                    Pros
+                    Преимущества
                   </span>
                   <p className="flex flex-col">
                     {car.advantages &&
@@ -297,7 +297,7 @@ export default function Cars({ data }: { data: any }) {
                 {/* Disadvantages */}
                 <div>
                   <span className="mx-auto mb-1 inline-block w-fit text-base font-medium">
-                    Cons
+                    Недостатки
                   </span>
                   <p className="flex flex-col">
                     {car.disadvantages &&
