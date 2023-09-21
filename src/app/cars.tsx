@@ -12,12 +12,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 export default function Cars({ data }: { data: any }) {
   const [cars, setCars] = useState(data);
   const [isLoading, setLoading] = useState(true);
   return (
     <>
+      <Input
+        type="text"
+        placeholder="Поиск по названию"
+        className="mb-3 w-full max-w-md"
+        onChange={(e) => {
+          const filtered = [...data].filter((car: Car) =>
+            car.name.toLowerCase().includes(e.target.value.toLowerCase()),
+          );
+          setCars(filtered);
+        }}
+      />
       <Select
         onValueChange={(value) => {
           if (value === "Все салоны") {
@@ -26,7 +38,7 @@ export default function Cars({ data }: { data: any }) {
             const filtered = [...data].filter(
               (car: Car) => car.location === value,
             );
-            setCars(filtered.filter((car: Car) => car.location === value));
+            setCars(filtered);
           }
         }}
       >
@@ -83,7 +95,7 @@ export default function Cars({ data }: { data: any }) {
                     {car.advantages &&
                       car.advantages.split(",").map((item: string) => (
                         <span key={item} className="flex gap-1.5">
-                          <PlusIcon className="mt-2 h-2 w-2" />
+                          <PlusIcon className="mt-1.5 h-2 w-2" />
                           {item.trim()}
                         </span>
                       ))}
@@ -98,7 +110,7 @@ export default function Cars({ data }: { data: any }) {
                     {car.disadvantages &&
                       car.disadvantages.split(",").map((item: string) => (
                         <span key={item} className="flex gap-1.5">
-                          <MinusIcon className="mt-2 h-2 w-2" />
+                          <MinusIcon className="mt-1.5 h-2 w-2" />
                           {item.trim()}
                         </span>
                       ))}
