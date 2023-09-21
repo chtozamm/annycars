@@ -42,7 +42,7 @@ export default function Cars({ data }: { data: any }) {
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
         {cars?.map((car: any) => (
           <li key={car.id} className="flex w-full flex-col border-b pb-3">
-            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm transition-all duration-300 hover:brightness-75 md:h-72 md:w-96">
+            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm transition-all duration-300 md:h-72 md:w-96">
               <Image
                 src={car.image}
                 fill
@@ -58,8 +58,12 @@ export default function Cars({ data }: { data: any }) {
               {/* {car.offer_link && <ExternalLink url={car.offer_link} />} */}
             </p>
             <p className="mb-1 w-full border-b pb-1"></p>
-            <p className="flex items-start justify-between text-lg">
+            <p className="flex items-center justify-between text-lg">
               {car.price && car.price + " ₽"}
+              <span className="text-sm font-light">
+                Mileage: {car.mileage} km
+              </span>
+
               {/* {car.location && (
                 <span className="ml-auto flex items-center gap-1 text-sm text-gray-500">
                   {car.location}
@@ -67,7 +71,7 @@ export default function Cars({ data }: { data: any }) {
                 </span>
               )} */}
             </p>
-            <p className="mt-6">Mileage: {car.mileage} km</p>
+            {/* <p className="mt-6">Mileage: {car.mileage} km</p> */}
             <div className="mt-6 flex flex-col gap-3">
               {/* Advantages */}
               <div className="grid grid-cols-2">
@@ -103,13 +107,13 @@ export default function Cars({ data }: { data: any }) {
               </div>
             </div>
             <div className="mt-auto flex justify-between pt-6">
-              {car.offer_link && <ExternalLink url={car.offer_link} />}
               {car.location && (
                 <span className="flex items-center gap-1 text-sm text-gray-400">
                   {car.location}
                   {/* <PersonIcon className="mt-0.5 h-3 w-3" /> */}
                 </span>
               )}
+              {car.offer_link && <ExternalLink url={car.offer_link} />}
             </div>
             {/* <span className="flex items-center gap-1">
               edit
