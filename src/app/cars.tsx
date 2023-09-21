@@ -13,15 +13,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function Cars({ data }: { data: any }) {
   const locationsSet = new Set();
   data.forEach((car: Car) => locationsSet.add(car.location));
   const locations: string[] = [];
   locationsSet.forEach((location) => locations.push(location as string));
+  locations.sort();
   const [cars, setCars] = useState(data);
   const [inputState, setInputState] = useState("");
   const [filterState, setFilterState] = useState("Все салоны");
+  const [sortState, setSortState] = useState("createdAt");
   const [isLoading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
   return (
@@ -29,6 +32,7 @@ export default function Cars({ data }: { data: any }) {
       <div className="relative h-fit w-full max-w-md">
         <Input
           type="text"
+          value={inputState}
           placeholder="Поиск по названию"
           className="mb-3 w-full max-w-md pl-9"
           ref={searchRef}
@@ -103,6 +107,8 @@ export default function Cars({ data }: { data: any }) {
       </div>
       {/* Filter */}
       <Select
+        value={filterState}
+        defaultValue="Все салоны"
         onValueChange={(value) => {
           if (value === "Все салоны") {
             setFilterState("Все салоны");
@@ -153,11 +159,13 @@ export default function Cars({ data }: { data: any }) {
       </Select>
       {/* Sort */}
       <Select
+        value={sortState}
         defaultValue="createdAt"
         onValueChange={(value) => {
           let sorted;
           switch (value) {
             case "createdAt":
+              setSortState("createdAt");
               sorted = [...data].filter((car: Car) =>
                 filterState !== "Все салоны"
                   ? car.location === filterState &&
@@ -168,6 +176,7 @@ export default function Cars({ data }: { data: any }) {
               break;
 
             case "year":
+              setSortState("year");
               sorted = [...cars].sort(
                 (a, b) => Number(b.year) - Number(a.year),
               );
@@ -175,6 +184,7 @@ export default function Cars({ data }: { data: any }) {
               break;
 
             case "mileage":
+              setSortState("mileage");
               sorted = [...cars].sort(
                 (a, b) =>
                   Number(a.mileage.replace(" ", "")) -
@@ -184,6 +194,7 @@ export default function Cars({ data }: { data: any }) {
               break;
 
             case "price":
+              setSortState("price");
               sorted = [...cars].sort((a, b) => {
                 if (isNaN(Number(a.price.replace(" ", "")))) return 1;
                 if (isNaN(Number(b.price.replace(" ", "")))) return -1;
@@ -200,7 +211,7 @@ export default function Cars({ data }: { data: any }) {
           }
         }}
       >
-        <SelectTrigger className="relative mb-6 w-full max-w-md pl-9">
+        <SelectTrigger className="relative mb-3 w-full max-w-md pl-9">
           <svg
             className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
             data-testid="geist-icon"
@@ -230,6 +241,18 @@ export default function Cars({ data }: { data: any }) {
           <SelectItem value="price">по цене</SelectItem>
         </SelectContent>
       </Select>
+      <Button
+        className="mb-6 w-full max-w-md"
+        onClick={() => {
+          setInputState("");
+          searchRef!.current!.value = "";
+          setFilterState("Все салоны");
+          setSortState("createdAt");
+          setCars(data);
+        }}
+      >
+        Сбросить фильтры
+      </Button>
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
         {cars?.map((car: any) => (
           <li key={car.id} className="flex w-full flex-col border-b pb-3">
