@@ -16,7 +16,9 @@ import { Input } from "@/components/ui/input";
 
 export default function Cars({ data }: { data: any }) {
   const [cars, setCars] = useState(data);
-  const [location, setLocation] = useState("");
+  // const [location, setLocation] = useState("");
+  const [inputState, setInputState] = useState("");
+  const [selectState, setSelectState] = useState("Все салоны");
   const [isLoading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
   return (
@@ -28,73 +30,83 @@ export default function Cars({ data }: { data: any }) {
           className="mb-3 w-full max-w-md"
           ref={searchRef}
           onChange={(e) => {
-            const filtered = [...cars].filter((car: Car) =>
-              car.name.toLowerCase().includes(e.target.value.toLowerCase()),
-            );
-            setCars(filtered);
-          }}
-        />
-        <button
-          className="absolute right-3 top-3 text-gray-500"
-          onClick={() => {
-            searchRef!.current!.value = "";
-            if (location === "") {
-              setCars(data);
-            } else {
-              const filtered = [...data].filter(
-                (car: Car) => car.location === location,
+            setInputState(e.target.value);
+            if (selectState === "Все салоны") {
+              const filtered = [...data].filter((car: Car) =>
+                car.name.toLowerCase().includes(e.target.value.toLowerCase()),
               );
               setCars(filtered);
-              setLocation(location);
+            } else {
+              const filtered = [...data].filter(
+                (car: Car) =>
+                  car.name
+                    .toLowerCase()
+                    .includes(e.target.value.toLowerCase()) &&
+                  car.location === selectState,
+              );
+              setCars(filtered);
             }
           }}
-        >
-          <svg
-            className="h-4 w-4"
-            data-testid="geist-icon"
-            fill="none"
-            height="24"
-            shape-rendering="geometricPrecision"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.6"
-            viewBox="0 0 24 24"
-            width="24"
+        />
+        {searchRef?.current?.value && (
+          <button
+            className="absolute right-3 top-3 text-gray-500"
+            onClick={() => {
+              searchRef!.current!.value = "";
+              setInputState("");
+              if (selectState === "Все салоны") {
+                setCars(data);
+              } else {
+                setCars(
+                  [...data].filter((car: Car) => car.location === selectState),
+                );
+              }
+              // if (location === "") {
+              //   setCars(data);
+              // } else {
+              //   const filtered = [...data].filter(
+              //     (car: Car) => car.location === location,
+              //   );
+              //   setCars(filtered);
+              //   setLocation(location);
+              // }
+            }}
           >
-            <path d="M18 6L6 18" />
-            <path d="M6 6l12 12" />
-          </svg>
-          {/* <svg
-            data-testid="geist-icon"
-            fill="none"
-            height="24"
-            shape-rendering="geometricPrecision"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            viewBox="0 0 24 24"
-            width="24"
-            className="h-4 w-4"
-          >
-            <circle cx="12" cy="12" r="10" fill="var(--geist-fill)" />
-            <path d="M15 9l-6 6" stroke="var(--geist-stroke)" />
-            <path d="M9 9l6 6" stroke="var(--geist-stroke)" />
-          </svg> */}
-        </button>
+            <svg
+              className="h-4 w-4"
+              data-testid="geist-icon"
+              fill="none"
+              height="24"
+              shape-rendering="geometricPrecision"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.6"
+              viewBox="0 0 24 24"
+              width="24"
+            >
+              <path d="M18 6L6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
       <Select
         onValueChange={(value) => {
           if (value === "Все салоны") {
-            setCars(data);
-            setLocation("");
-          } else {
-            const filtered = [...data].filter(
-              (car: Car) => car.location === value,
+            setSelectState("Все салоны");
+            const filtered = [...data].filter((car: Car) =>
+              car.name.toLowerCase().includes(inputState.toLowerCase()),
             );
             setCars(filtered);
-            setLocation(value);
+          } else {
+            setSelectState(value);
+            const filtered = [...data].filter(
+              (car: Car) =>
+                car.location === value &&
+                car.name.toLowerCase().includes(inputState.toLowerCase()),
+            );
+            setCars(filtered);
           }
         }}
       >
