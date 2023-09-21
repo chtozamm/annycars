@@ -3,7 +3,7 @@
 import { PlusIcon, MinusIcon, PersonIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import ExternalLink from "@/components/externalLink";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import {
   Select,
@@ -16,29 +16,85 @@ import { Input } from "@/components/ui/input";
 
 export default function Cars({ data }: { data: any }) {
   const [cars, setCars] = useState(data);
+  const [location, setLocation] = useState("");
   const [isLoading, setLoading] = useState(true);
+  const searchRef = useRef(null);
   return (
     <>
-      <Input
-        type="text"
-        placeholder="Поиск по названию"
-        className="mb-3 w-full max-w-md"
-        onChange={(e) => {
-          const filtered = [...data].filter((car: Car) =>
-            car.name.toLowerCase().includes(e.target.value.toLowerCase()),
-          );
-          setCars(filtered);
-        }}
-      />
+      <div className="relative h-fit w-full max-w-md">
+        <Input
+          type="text"
+          placeholder="Поиск по названию"
+          className="mb-3 w-full max-w-md"
+          ref={searchRef}
+          onChange={(e) => {
+            const filtered = [...cars].filter((car: Car) =>
+              car.name.toLowerCase().includes(e.target.value.toLowerCase()),
+            );
+            setCars(filtered);
+          }}
+        />
+        <button
+          className="absolute right-3 top-3 text-gray-500"
+          onClick={() => {
+            searchRef!.current!.value = "";
+            if (location === "") {
+              setCars(data);
+            } else {
+              const filtered = [...data].filter(
+                (car: Car) => car.location === location,
+              );
+              setCars(filtered);
+              setLocation(location);
+            }
+          }}
+        >
+          <svg
+            className="h-4 w-4"
+            data-testid="geist-icon"
+            fill="none"
+            height="24"
+            shape-rendering="geometricPrecision"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.6"
+            viewBox="0 0 24 24"
+            width="24"
+          >
+            <path d="M18 6L6 18" />
+            <path d="M6 6l12 12" />
+          </svg>
+          {/* <svg
+            data-testid="geist-icon"
+            fill="none"
+            height="24"
+            shape-rendering="geometricPrecision"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            width="24"
+            className="h-4 w-4"
+          >
+            <circle cx="12" cy="12" r="10" fill="var(--geist-fill)" />
+            <path d="M15 9l-6 6" stroke="var(--geist-stroke)" />
+            <path d="M9 9l6 6" stroke="var(--geist-stroke)" />
+          </svg> */}
+        </button>
+      </div>
       <Select
         onValueChange={(value) => {
           if (value === "Все салоны") {
             setCars(data);
+            setLocation("");
           } else {
             const filtered = [...data].filter(
               (car: Car) => car.location === value,
             );
             setCars(filtered);
+            setLocation(value);
           }
         }}
       >
@@ -47,8 +103,14 @@ export default function Cars({ data }: { data: any }) {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="Все салоны">Все салоны</SelectItem>
-          <SelectItem value="РОЛЬФ Лахта">РОЛЬФ Лахта</SelectItem>
-          <SelectItem value="Автополе Мультикар">Автополе Мультикар</SelectItem>
+          {data.map(
+            (car: Car) =>
+              car.location && (
+                <SelectItem key={car.id} value={car.location}>
+                  {car.location}
+                </SelectItem>
+              ),
+          )}
         </SelectContent>
       </Select>
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
