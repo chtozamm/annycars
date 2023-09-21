@@ -18,7 +18,7 @@ export default function Cars({ data }: { data: any }) {
   const [cars, setCars] = useState(data);
   const [inputState, setInputState] = useState("");
   const [filterState, setFilterState] = useState("Все салоны");
-  const [sortState, setSortState] = useState("по дате добавления");
+  const [sortState, setSortState] = useState("createdAt");
   const [isLoading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
   return (
@@ -154,20 +154,48 @@ export default function Cars({ data }: { data: any }) {
       {/* Sort */}
       <Select
         onValueChange={(value) => {
-          if (value === "по дате добавления") {
-            setSortState("по дате добавления");
-            const filtered = [...data].filter((car: Car) =>
-              car.name.toLowerCase().includes(inputState.toLowerCase()),
-            );
-            setCars(filtered);
-          } else {
-            setSortState(value);
-            // const filtered = [...data].filter(
-            //   (car: Car) =>
-            //     car.location === value &&
-            //     car.name.toLowerCase().includes(inputState.toLowerCase()),
-            // );
-            // setCars(filtered);
+          let sorted;
+          switch (value) {
+            case "createdAt":
+              sorted = [...data].filter((car: Car) =>
+                filterState !== "Все салоны"
+                  ? car.location === filterState &&
+                    car.name.toLowerCase().includes(inputState.toLowerCase())
+                  : car.name.toLowerCase().includes(inputState.toLowerCase()),
+              );
+              setCars(sorted);
+              break;
+
+            case "year":
+              sorted = [...cars].sort(
+                (a, b) => Number(b.year) - Number(a.year),
+              );
+              setCars(sorted);
+              break;
+
+            case "mileage":
+              sorted = [...cars].sort(
+                (a, b) =>
+                  Number(a.mileage.replace(" ", "")) -
+                  Number(b.mileage.replace(" ", "")),
+              );
+              setCars(sorted);
+              break;
+
+            case "price":
+              sorted = [...cars].sort((a, b) => {
+                if (isNaN(Number(a.price.replace(" ", "")))) return 1;
+                if (isNaN(Number(b.price.replace(" ", "")))) return -1;
+                return (
+                  Number(a.price.replace(" ", "")) -
+                  Number(b.price.replace(" ", ""))
+                );
+              });
+              setCars(sorted);
+              break;
+
+            default:
+              break;
           }
         }}
       >
@@ -193,10 +221,10 @@ export default function Cars({ data }: { data: any }) {
           />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="по дате добавления">по дате добавления</SelectItem>
-          <SelectItem value="по году выпуска">по году выпуска</SelectItem>
-          <SelectItem value="по пробегу">по пробегу</SelectItem>
-          <SelectItem value="по цене">по цене</SelectItem>
+          <SelectItem value="createdAt">по дате добавления</SelectItem>
+          <SelectItem value="year">по году выпуска</SelectItem>
+          <SelectItem value="mileage">по пробегу</SelectItem>
+          <SelectItem value="price">по цене</SelectItem>
         </SelectContent>
       </Select>
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
