@@ -41,11 +41,9 @@ export default function Cars({ data }: { data: any }) {
   return (
     <>
       <motion.header
-        initial={{ opacity: 0, y: "10%", scale: 0.8 }}
+        initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          y: "0%",
-          scale: 1,
           transition: {
             duration: 1,
             type: "tween",
@@ -80,7 +78,7 @@ export default function Cars({ data }: { data: any }) {
       </motion.header>
 
       <motion.div
-        className="mx-auto flex w-full max-w-md flex-col justify-center"
+        className="mx-auto mt-3 flex w-full max-w-md flex-col justify-center"
         initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
@@ -88,6 +86,7 @@ export default function Cars({ data }: { data: any }) {
             duration: 1,
             type: "tween",
             ease: "easeOut",
+            delay: 0.8,
           },
         }}
       >
@@ -416,6 +415,7 @@ export default function Cars({ data }: { data: any }) {
             duration: 1,
             type: "tween",
             ease: "easeOut",
+            delay: 1.6,
           },
         }}
         className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2"
