@@ -63,7 +63,7 @@ export default function Cars({ data }: { data: any }) {
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="1.5"
+          strokeWidth="1.5"
           viewBox="0 0 24 24"
           width="24"
         >
@@ -125,7 +125,7 @@ export default function Cars({ data }: { data: any }) {
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="1.6"
+            strokeWidth="1.6"
             viewBox="0 0 24 24"
             width="24"
             className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
@@ -159,7 +159,7 @@ export default function Cars({ data }: { data: any }) {
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="1.6"
+                strokeWidth="1.6"
                 viewBox="0 0 24 24"
                 width="24"
               >
@@ -201,7 +201,7 @@ export default function Cars({ data }: { data: any }) {
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="1.6"
+              strokeWidth="1.6"
               viewBox="0 0 24 24"
               width="24"
             >
@@ -281,7 +281,7 @@ export default function Cars({ data }: { data: any }) {
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="1.6"
+              strokeWidth="1.6"
               viewBox="0 0 24 24"
               width="24"
             >
@@ -328,7 +328,7 @@ export default function Cars({ data }: { data: any }) {
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 viewBox="0 0 24 24"
                 width="24"
               >
@@ -421,10 +421,7 @@ export default function Cars({ data }: { data: any }) {
         className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2"
       >
         {cars?.map((car: any) => (
-          <li
-            key={car.id}
-            className="flex w-full max-w-[384px] flex-col border-b pb-3"
-          >
+          <li key={car.id} className="flex w-full max-w-[384px] flex-col pb-3">
             <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm md:h-72 md:w-96">
               <Image
                 src={car.image}
@@ -436,8 +433,24 @@ export default function Cars({ data }: { data: any }) {
                 onLoadingComplete={() => setLoading(false)}
               />
             </div>
-            <p className="flex items-end justify-between text-xl font-semibold">
+            <p className="flex items-center justify-between text-xl font-semibold">
               {car.name}, {car.year}
+              <span className="text-gray-400">
+                <svg
+                  data-testid="geist-icon"
+                  fill="none"
+                  shape-rendering="geometricPrecision"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  strokeWidth="1"
+                  viewBox="0 0 24 24"
+                  className="h-6 w-6"
+                >
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </span>
             </p>
             <p className="mb-1 w-full border-b pb-1"></p>
             <p className="flex items-center justify-between text-lg">
@@ -445,15 +458,13 @@ export default function Cars({ data }: { data: any }) {
                 (isNaN(car.price.replace(" ", ""))
                   ? car.price
                   : car.price + " ₽")}
-              <span className="text-sm font-light">
-                Пробег: {car.mileage} км
-              </span>
+              <span className="text-sm text-gray-600">{car.mileage} км</span>
             </p>
             {(car.advantages || car.disadvantages) && (
-              <div className="mt-6 grid grid-cols-2">
+              <div className="mt-6 grid grid-cols-1 gap-6">
                 {/* Advantages */}
                 <div>
-                  <span className="mx-auto mb-1 inline-block w-fit text-base font-medium">
+                  <span className="mb-1 ml-3 inline-block text-base font-medium">
                     Преимущества
                   </span>
                   <p className="flex flex-col">
@@ -468,7 +479,7 @@ export default function Cars({ data }: { data: any }) {
                 </div>
                 {/* Disadvantages */}
                 <div>
-                  <span className="mx-auto mb-1 inline-block w-fit text-base font-medium">
+                  <span className="mb-1 ml-3 inline-block text-base font-medium">
                     Недостатки
                   </span>
                   <p className="flex flex-col">
@@ -492,23 +503,6 @@ export default function Cars({ data }: { data: any }) {
               )}
               {car.offer_link && <ExternalLink url={car.offer_link} />}
             </div>
-            {/* <span className="flex items-center gap-1">
-              edit
-              <svg
-                data-testid="geist-icon"
-                fill="none"
-                shape-rendering="geometricPrecision"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                className="h-4 w-4"
-              >
-                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-            </span> */}
           </li>
         ))}
       </motion.ul>
