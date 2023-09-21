@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: "Annycars",
   description:
     "Convinient list of car offers with notes to help you make the right choice.",
+  viewport: {
+    maximumScale: 1.0,
+    initialScale: 1.0,
+    width: "device-width",
+  },
 };
 
 export default function RootLayout({
