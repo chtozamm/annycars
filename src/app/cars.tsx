@@ -15,10 +15,13 @@ import {
 import { Input } from "@/components/ui/input";
 
 export default function Cars({ data }: { data: any }) {
+  const locationsSet = new Set();
+  data.forEach((car: Car) => locationsSet.add(car.location));
+  const locations: string[] = [];
+  locationsSet.forEach((location) => locations.push(location as string));
   const [cars, setCars] = useState(data);
   const [inputState, setInputState] = useState("");
   const [filterState, setFilterState] = useState("Все салоны");
-  const [sortState, setSortState] = useState("createdAt");
   const [isLoading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
   return (
@@ -141,14 +144,11 @@ export default function Cars({ data }: { data: any }) {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="Все салоны">Все салоны</SelectItem>
-          {data.map(
-            (car: Car) =>
-              car.location && (
-                <SelectItem key={car.id} value={car.location}>
-                  {car.location}
-                </SelectItem>
-              ),
-          )}
+          {locations.map((location) => (
+            <SelectItem key={location} value={location}>
+              {location}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       {/* Sort */}
