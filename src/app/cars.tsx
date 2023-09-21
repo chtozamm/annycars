@@ -4,6 +4,7 @@ import { PlusIcon, MinusIcon, PersonIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import ExternalLink from "@/components/externalLink";
 import { useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 import {
   Select,
@@ -14,6 +15,16 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export default function Cars({ data }: { data: any }) {
   const locationsSet = new Set();
@@ -29,6 +40,32 @@ export default function Cars({ data }: { data: any }) {
   const searchRef = useRef<HTMLInputElement>(null);
   return (
     <>
+      <header className="pointer-events-none flex h-16 w-full max-w-md cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold">
+        <svg
+          className="h-8 w-8"
+          data-testid="geist-icon"
+          fill="none"
+          height="24"
+          shape-rendering="geometricPrecision"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          viewBox="0 0 24 24"
+          width="24"
+        >
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M12 2L2 19.7778H22L12 2Z"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+        </svg>
+        annycars
+      </header>
+
       <div className="relative h-fit w-full max-w-md">
         <Input
           type="text"
@@ -241,18 +278,109 @@ export default function Cars({ data }: { data: any }) {
           <SelectItem value="price">по цене</SelectItem>
         </SelectContent>
       </Select>
-      {/* <Button
+      <Button
         className="mb-6 w-full max-w-md"
-        onDoubleClick={() => {
-          setInputState("");
-          searchRef!.current!.value = "";
-          setFilterState("Все салоны");
-          setSortState("createdAt");
-          setCars(data);
+        onClick={() => {
+          // setInputState("");
+          // searchRef!.current!.value = "";
+          // setFilterState("Все салоны");
+          // setSortState("createdAt");
+          // setCars(data);
+          null;
         }}
       >
         Сбросить фильтры
-      </Button> */}
+      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className="mb-6 flex items-center gap-1.5" variant="outline">
+            <svg
+              data-testid="geist-icon"
+              fill="none"
+              height="24"
+              shape-rendering="geometricPrecision"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="24"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <path d="M12 8v8" />
+              <path d="M8 12h8" />
+            </svg>
+            Добавить автомобиль
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Добавить автомобиль</DialogTitle>
+            <DialogDescription>
+              Обязательными полями являются только &quot;Название&quot; и
+              &quot;Ссылка на объявление&quot;.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label
+                htmlFor="name"
+                className="text-right after:text-red-600 after:content-['*']"
+              >
+                Название
+              </Label>
+              <Input id="name" className="col-span-3" required />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="year" className="text-right">
+                Год выпуска
+              </Label>
+              <Input id="year" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label
+                htmlFor="link"
+                className="text-right after:text-red-600 after:content-['*']"
+              >
+                Объявление
+              </Label>
+              <Input
+                id="link"
+                className="col-span-3"
+                placeholder="https://"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="picture" className="text-right">
+                Фото
+              </Label>
+              <Input
+                id="picture"
+                className="col-span-3"
+                placeholder="https://"
+              />
+            </div>
+            <div className="relative grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="price" className="text-right">
+                Цена
+              </Label>
+              <Input id="price" className="col-span-3" />
+              <span className="absolute right-3 top-2">₽</span>
+            </div>
+            <div className="relative grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="mileage" className="text-right">
+                Пробег
+              </Label>
+              <Input id="mileage" className="col-span-3" />
+              <span className="absolute right-3 top-2">км</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit">Сохранить</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <ul className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2">
         {cars?.map((car: any) => (
           <li
@@ -275,14 +403,17 @@ export default function Cars({ data }: { data: any }) {
             </p>
             <p className="mb-1 w-full border-b pb-1"></p>
             <p className="flex items-center justify-between text-lg">
-              {car.price && car.price + " ₽"}
+              {car.price &&
+                (isNaN(car.price.replace(" ", ""))
+                  ? car.price
+                  : car.price + " ₽")}
               <span className="text-sm font-light">
                 Пробег: {car.mileage} км
               </span>
             </p>
-            <div className="mt-6 flex flex-col gap-3">
-              {/* Advantages */}
-              <div className="grid grid-cols-2">
+            {(car.advantages || car.disadvantages) && (
+              <div className="mt-6 grid grid-cols-2">
+                {/* Advantages */}
                 <div>
                   <span className="mx-auto mb-1 inline-block w-fit text-base font-medium">
                     Преимущества
@@ -313,7 +444,7 @@ export default function Cars({ data }: { data: any }) {
                   </p>
                 </div>
               </div>
-            </div>
+            )}
             <div className="mt-auto flex justify-between pt-6">
               {car.location && (
                 <span className="flex items-center gap-1 text-sm text-gray-400">

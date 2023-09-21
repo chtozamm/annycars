@@ -1,7 +1,7 @@
 export default function Header() {
   return (
     <header className="flex h-16 w-full items-center justify-center gap-3">
-      <button className="flex gap-1.5 rounded-sm transition-colors duration-300 hover:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 active:text-gray-400">
+      {/* <button className="flex gap-1.5 rounded-sm transition-colors duration-300 hover:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 active:text-gray-400">
         <svg
           data-testid="geist-icon"
           fill="none"
@@ -19,7 +19,7 @@ export default function Header() {
           <path d="M8 12h8" />
         </svg>
         Добавить автомобиль
-      </button>
+      </button> */}
     </header>
   );
 }
