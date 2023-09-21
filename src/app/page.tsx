@@ -38,7 +38,7 @@ export default async function Home() {
     <main className="flex min-h-screen flex-col items-center justify-start px-3 pb-8">
       {/* <Search /> */}
       {/* <Sort /> */}
-      <Cars cars={cars} />
+      <Cars data={cars} />
     </main>
   );
 }

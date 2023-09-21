@@ -13,7 +13,8 @@ export default function Sort() {
         <SelectValue placeholder="Сортировать по компании" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="rolf-lahta">РОЛЬФ Лахта</SelectItem>
+        <SelectItem value="РОЛЬФ Лахта">РОЛЬФ Лахта</SelectItem>
+        <SelectItem value="Автополе Мультикар">Автополе Мультикар</SelectItem>
       </SelectContent>
     </Select>
   );
