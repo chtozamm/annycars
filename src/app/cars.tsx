@@ -153,6 +153,7 @@ export default function Cars({ data }: { data: any }) {
       </Select>
       {/* Sort */}
       <Select
+        defaultValue="createdAt"
         onValueChange={(value) => {
           let sorted;
           switch (value) {
@@ -216,12 +217,14 @@ export default function Cars({ data }: { data: any }) {
             <path d="M15 18H3M21 6H3M17 12H3" />
           </svg>
           <SelectValue
-            placeholder="Сортировать по"
+            placeholder="по дате добавления"
             className="placeholder:text-gray-400"
           />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="createdAt">по дате добавления</SelectItem>
+          <SelectItem defaultChecked value="createdAt">
+            по дате добавления
+          </SelectItem>
           <SelectItem value="year">по году выпуска</SelectItem>
           <SelectItem value="mileage">по пробегу</SelectItem>
           <SelectItem value="price">по цене</SelectItem>
