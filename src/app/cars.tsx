@@ -1,11 +1,12 @@
 "use client";
 
-import { PlusIcon, MinusIcon, PersonIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
-import ExternalLink from "@/components/externalLink";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 
+// UI
+import ExternalLink from "@/components/externalLink";
+import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
 import {
   Select,
   SelectContent,
@@ -26,20 +27,83 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
-export default function Cars({ data }: { data: any }) {
-  const locationsSet = new Set();
-  data.forEach((car: Car) => locationsSet.add(car.location));
-  const locations: string[] = [];
-  locationsSet.forEach((location) => locations.push(location as string));
-  locations.sort();
+export default function Cars({
+  data,
+  addCar,
+}: {
+  data: Car[];
+  addCar: Function;
+}) {
+  // Creates set and converts to array with unique sellers
+  // Used for filtering cars
+  const sellersSet = new Set();
+  data.forEach((car: Car) => sellersSet.add(car.seller));
+  const sellers: string[] = [];
+  sellersSet.forEach((location) => sellers.push(location as string));
+  sellers.sort();
+  sellersSet.clear();
+
   const [cars, setCars] = useState(data);
   const [inputState, setInputState] = useState("");
-  const [filterState, setFilterState] = useState("Все салоны");
-  const [sortState, setSortState] = useState("createdAt");
+  const [filterState, setFilterState] = useState("Все продавцы");
+  const [sortState, setSortState] = useState("created_at");
   const [isLoading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  function sortCars(cars: Car[], value: string) {
+    switch (value) {
+      case "year":
+        setCars([...cars].sort((a, b) => Number(b.year) - Number(a.year)));
+        break;
+      case "mileage":
+        setCars(
+          [...cars].sort(
+            (a, b) =>
+              Number(a.mileage?.replace(" ", "")) -
+              Number(b.mileage?.replace(" ", "")),
+          ),
+        );
+        break;
+      case "price":
+        setCars(
+          [...cars].sort((a, b) => {
+            if (isNaN(Number(a.price?.replace(" ", "")))) return 1;
+            if (isNaN(Number(b.price?.replace(" ", "")))) return -1;
+            return (
+              Number(a.price?.replace(" ", "")) -
+              Number(b.price?.replace(" ", ""))
+            );
+          }),
+        );
+        break;
+      case "created_at":
+        setCars(
+          [...cars].sort(
+            (a, b) => b.created_at!.valueOf() - a.created_at!.valueOf(),
+          ),
+        );
+        break;
+      default:
+        break;
+    }
+  }
+
+  function resetFilters() {
+    setInputState("");
+    searchRef!.current!.value = "";
+    setFilterState("Все продавцы");
+    setSortState("created_at");
+    setCars(data);
+  }
+
+  useEffect(() => {
+    sortCars(cars, sortState);
+    // // eslint-disable-next-line
+  }, [sortState, inputState, filterState]);
+
   return (
     <>
+      {/* Header */}
       <motion.header
         initial={{ opacity: 0 }}
         animate={{
@@ -75,7 +139,7 @@ export default function Cars({ data }: { data: any }) {
         </svg>
         annycars
       </motion.header>
-
+      {/* Container for actions */}
       <motion.div
         className="mx-auto flex w-full max-w-md flex-col justify-center"
         initial={{ opacity: 0, y: "10px" }}
@@ -90,6 +154,7 @@ export default function Cars({ data }: { data: any }) {
           },
         }}
       >
+        {/* Add new car */}
         <Dialog>
           <DialogTrigger asChild>
             <Button
@@ -179,10 +244,22 @@ export default function Cars({ data }: { data: any }) {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Сохранить</Button>
+              <Button
+                type="submit"
+                onClick={() =>
+                  addCar({
+                    name: "Subaru Impreza",
+                    year: "2007",
+                    link: "https://www.annycars.online",
+                  })
+                }
+              >
+                Сохранить
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        {/* Search */}
         <div className="relative h-fit w-full max-w-md">
           <Input
             type="text"
@@ -192,7 +269,7 @@ export default function Cars({ data }: { data: any }) {
             ref={searchRef}
             onChange={(e) => {
               setInputState(e.target.value);
-              if (filterState === "Все салоны") {
+              if (filterState === "Все продавцы") {
                 const filtered = [...data].filter((car: Car) =>
                   car.name.toLowerCase().includes(e.target.value.toLowerCase()),
                 );
@@ -203,7 +280,7 @@ export default function Cars({ data }: { data: any }) {
                     car.name
                       .toLowerCase()
                       .includes(e.target.value.toLowerCase()) &&
-                    car.location === filterState,
+                    car.seller === filterState,
                 );
                 setCars(filtered);
               }
@@ -230,13 +307,11 @@ export default function Cars({ data }: { data: any }) {
               onClick={() => {
                 searchRef!.current!.value = "";
                 setInputState("");
-                if (filterState === "Все салоны") {
+                if (filterState === "Все продавцы") {
                   setCars(data);
                 } else {
                   setCars(
-                    [...data].filter(
-                      (car: Car) => car.location === filterState,
-                    ),
+                    [...data].filter((car: Car) => car.seller === filterState),
                   );
                 }
               }}
@@ -262,10 +337,10 @@ export default function Cars({ data }: { data: any }) {
         {/* Filter */}
         <Select
           value={filterState}
-          defaultValue="Все салоны"
+          defaultValue="Все продавцы"
           onValueChange={(value) => {
-            if (value === "Все салоны") {
-              setFilterState("Все салоны");
+            if (value === "Все продавцы") {
+              setFilterState("Все продавцы");
               const filtered = [...data].filter((car: Car) =>
                 car.name.toLowerCase().includes(inputState.toLowerCase()),
               );
@@ -274,7 +349,7 @@ export default function Cars({ data }: { data: any }) {
               setFilterState(value);
               const filtered = [...data].filter(
                 (car: Car) =>
-                  car.location === value &&
+                  car.seller === value &&
                   car.name.toLowerCase().includes(inputState.toLowerCase()),
               );
               setCars(filtered);
@@ -302,8 +377,8 @@ export default function Cars({ data }: { data: any }) {
             />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Все салоны">Все салоны</SelectItem>
-            {locations.map((location) => (
+            <SelectItem value="Все продавцы">Все продавцы</SelectItem>
+            {sellers.map((location) => (
               <SelectItem key={location} value={location}>
                 {location}
               </SelectItem>
@@ -313,47 +388,20 @@ export default function Cars({ data }: { data: any }) {
         {/* Sort */}
         <Select
           value={sortState}
-          defaultValue="createdAt"
+          defaultValue="created_at"
           onValueChange={(value) => {
-            let sorted;
             switch (value) {
-              case "createdAt":
-                setSortState("createdAt");
-                sorted = [...data].filter((car: Car) =>
-                  filterState !== "Все салоны"
-                    ? car.location === filterState &&
-                      car.name.toLowerCase().includes(inputState.toLowerCase())
-                    : car.name.toLowerCase().includes(inputState.toLowerCase()),
-                );
-                setCars(sorted);
+              case "created_at":
+                setSortState("created_at");
                 break;
               case "year":
                 setSortState("year");
-                sorted = [...cars].sort(
-                  (a, b) => Number(b.year) - Number(a.year),
-                );
-                setCars(sorted);
                 break;
               case "mileage":
                 setSortState("mileage");
-                sorted = [...cars].sort(
-                  (a, b) =>
-                    Number(a.mileage.replace(" ", "")) -
-                    Number(b.mileage.replace(" ", "")),
-                );
-                setCars(sorted);
                 break;
               case "price":
                 setSortState("price");
-                sorted = [...cars].sort((a, b) => {
-                  if (isNaN(Number(a.price.replace(" ", "")))) return 1;
-                  if (isNaN(Number(b.price.replace(" ", "")))) return -1;
-                  return (
-                    Number(a.price.replace(" ", "")) -
-                    Number(b.price.replace(" ", ""))
-                  );
-                });
-                setCars(sorted);
                 break;
               default:
                 break;
@@ -381,7 +429,7 @@ export default function Cars({ data }: { data: any }) {
             />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem defaultChecked value="createdAt">
+            <SelectItem defaultChecked value="created_at">
               по дате добавления
             </SelectItem>
             <SelectItem value="year">по году выпуска</SelectItem>
@@ -389,19 +437,22 @@ export default function Cars({ data }: { data: any }) {
             <SelectItem value="price">по цене</SelectItem>
           </SelectContent>
         </Select>
+        {/* Reset filters */}
         <Button
           className="mb-6 w-full max-w-md"
           onDoubleClickCapture={(e) => {
-            setInputState("");
-            searchRef!.current!.value = "";
-            setFilterState("Все салоны");
-            setSortState("createdAt");
-            setCars(data);
+            resetFilters();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              resetFilters();
+            }
           }}
         >
           Сбросить фильтры
         </Button>
       </motion.div>
+      {/* List of cars */}
       <motion.ul
         initial={{ opacity: 0, y: "10px" }}
         animate={{
@@ -414,11 +465,11 @@ export default function Cars({ data }: { data: any }) {
             delay: 1,
           },
         }}
-        className="grid w-full grid-flow-row auto-rows-max gap-8 text-sm md:w-auto md:grid-cols-2"
+        className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3"
       >
         {cars?.map((car: any) => (
-          <li key={car.id} className="flex w-full max-w-[384px] flex-col pb-3">
-            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm md:h-72 md:w-96">
+          <li key={car.id} className="flex w-full flex-col pb-3">
+            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm">
               <Image
                 src={car.image}
                 fill
