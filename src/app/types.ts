@@ -4,7 +4,7 @@ type Car = {
   name: string;
   year?: string | null;
   seller?: string | null;
-  offer_link?: string | null;
+  link?: string | null;
   advantages?: string | null;
   disadvantages?: string | null;
   image?: string | null;

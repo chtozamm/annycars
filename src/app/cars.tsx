@@ -39,7 +39,7 @@ export default function Cars({
   const sellersSet = new Set();
   data.forEach((car: Car) => sellersSet.add(car.seller));
   const sellers: string[] = [];
-  sellersSet.forEach((location) => sellers.push(location as string));
+  sellersSet.forEach((seller) => sellers.push(seller as string));
   sellers.sort();
   sellersSet.clear();
 
@@ -378,9 +378,9 @@ export default function Cars({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Все продавцы">Все продавцы</SelectItem>
-            {sellers.map((location) => (
-              <SelectItem key={location} value={location}>
-                {location}
+            {sellers.map((seller) => (
+              <SelectItem key={seller} value={seller}>
+                {seller}
               </SelectItem>
             ))}
           </SelectContent>
@@ -541,13 +541,13 @@ export default function Cars({
               </div>
             )}
             <div className="mt-auto flex justify-between pt-6">
-              {car.location && (
+              {car.seller && (
                 <span className="flex items-center gap-1 text-sm text-gray-400">
-                  {car.location}
+                  {car.seller}
                   {/* <PersonIcon className="mt-0.5 h-3 w-3" /> */}
                 </span>
               )}
-              {car.offer_link && <ExternalLink url={car.offer_link} />}
+              {car.link && <ExternalLink url={car.link} />}
             </div>
           </li>
         ))}
