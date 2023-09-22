@@ -20,9 +20,9 @@ export default async function Home() {
       data: {
         name: car.name,
         year: car.year || "",
-        location: car.seller || "",
+        seller: car.seller || "",
         image: car.image || "",
-        offer_link: car.offer_link || "",
+        link: car.link || "",
         advantages: car.advantages || "",
         disadvantages: car.disadvantages || "",
         price: car.price || "",
