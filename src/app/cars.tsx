@@ -42,6 +42,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export default function Cars({
   data,
@@ -169,6 +170,7 @@ export default function Cars({
     setFormImage("");
     setFormPrice("");
     setFormMileage("");
+    setFormSeller("");
     setFormAdvantages("");
     setFormDisadvantages("");
   }
@@ -237,7 +239,6 @@ export default function Cars({
             <Button
               className="mb-6 flex items-center gap-1.5"
               variant="outline"
-              onClick={() => {}}
             >
               <svg
                 className="mt-0.5 h-4 w-4"
@@ -403,9 +404,11 @@ export default function Cars({
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit" onClick={() => handleAddCar()}>
-                Добавить
-              </Button>
+              <DialogClose>
+                <Button type="submit" onClick={() => handleAddCar()}>
+                  Добавить
+                </Button>
+              </DialogClose>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -619,16 +622,18 @@ export default function Cars({
       >
         {optimisticCars?.map((car: any) => (
           <li key={car.id} className="flex w-full flex-col pb-3">
-            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm">
-              <Image
-                src={car.image}
-                fill
-                className={`bg-gray-200 object-cover transition-all duration-700 ease-in-out  ${
-                  isLoading ? "scale-110 blur-2xl" : "scale-100 blur-0"
-                }`}
-                alt=""
-                onLoadingComplete={() => setLoading(false)}
-              />
+            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md bg-gray-100 shadow-sm">
+              {car.image && (
+                <Image
+                  src={car.image}
+                  fill
+                  className={`bg-gray-200 object-cover transition-all duration-700 ease-in-out  ${
+                    isLoading ? "scale-110 blur-2xl" : "scale-100 blur-0"
+                  }`}
+                  alt=""
+                  onLoadingComplete={() => setLoading(false)}
+                />
+              )}
             </div>
             <p className="flex items-center justify-between text-xl font-semibold">
               {car.name}, {car.year}
@@ -644,6 +649,7 @@ export default function Cars({
                       setFormImage(car.image);
                       setFormPrice(car.price);
                       setFormMileage(car.mileage);
+                      setFormSeller(car.seller);
                       setFormAdvantages(car.advantages);
                       setFormDisadvantages(car.disadvantages);
                     }}
@@ -837,9 +843,14 @@ export default function Cars({
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
-                    <Button type="submit" onClick={() => handleUpdateCar(car)}>
-                      Сохранить
-                    </Button>
+                    <DialogClose>
+                      <Button
+                        type="submit"
+                        onClick={() => handleUpdateCar(car)}
+                      >
+                        Сохранить
+                      </Button>
+                    </DialogClose>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>

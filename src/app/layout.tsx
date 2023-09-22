@@ -5,13 +5,25 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Annycars",
+  title: "Annycars - помощник в выборе автомобиля",
   description:
-    "Convinient list of car offers with notes to help you make the right choice.",
+    "Удобная доска объявлений для сохранения, поиска и сортировки автомобилей.",
   viewport: {
     maximumScale: 1.0,
     initialScale: 1.0,
     width: "device-width",
+  },
+  openGraph: {
+    title: "Annycars - помощник в выборе автомобиля",
+    description:
+      "Удобная доска объявлений для сохранения, поиска и сортировки автомобилей.",
+    url: "https://www.annycars.online",
+  },
+  twitter: {
+    title: "Annycars - помощник в выборе автомобиля",
+    description:
+      "Удобная доска объявлений для сохранения, поиска и сортировки автомобилей.",
+    card: "summary_large_image",
   },
 };
 
