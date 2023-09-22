@@ -122,6 +122,22 @@ export default function Cars({
     }
   }
 
+  function filterCars() {
+    if (filterState === "Все продавцы") {
+      const filtered = [...data].filter((car: Car) =>
+        car.name.toLowerCase().includes(inputState.toLowerCase()),
+      );
+      return filtered;
+    } else {
+      const filtered = [...data].filter(
+        (car: Car) =>
+          car.seller === filterState &&
+          car.name.toLowerCase().includes(inputState.toLowerCase()),
+      );
+      return filtered;
+    }
+  }
+
   function resetFilters() {
     setInputState("");
     searchRef!.current!.value = "";
@@ -176,7 +192,8 @@ export default function Cars({
   }
 
   useEffect(() => {
-    sortCars(optimisticCars, sortState);
+    const filteredCars = filterCars();
+    sortCars(filteredCars, sortState);
     // // eslint-disable-next-line
   }, [sortState, inputState, filterState]);
 
@@ -491,23 +508,7 @@ export default function Cars({
         <Select
           value={filterState}
           defaultValue="Все продавцы"
-          onValueChange={(value) => {
-            if (value === "Все продавцы") {
-              setFilterState("Все продавцы");
-              const filtered = [...data].filter((car: Car) =>
-                car.name.toLowerCase().includes(inputState.toLowerCase()),
-              );
-              addOptimisticCars(filtered);
-            } else {
-              setFilterState(value);
-              const filtered = [...data].filter(
-                (car: Car) =>
-                  car.seller === value &&
-                  car.name.toLowerCase().includes(inputState.toLowerCase()),
-              );
-              addOptimisticCars(filtered);
-            }
-          }}
+          onValueChange={(value) => setFilterState(value)}
         >
           <SelectTrigger className="relative mb-3 w-full max-w-md pl-9">
             <svg
