@@ -64,11 +64,12 @@ export default function Cars({
   sellers.sort();
   sellersSet.clear();
 
-  const [inputState, setInputState] = useState("");
-  const [filterState, setFilterState] = useState("Все продавцы");
-  const [sortState, setSortState] = useState("created_at");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("Все продавцы");
+  const [sort, setSort] = useState("created_at");
   const [isLoading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
+  const [showSoldCars, setShowSoldCars] = useState(false);
 
   const [optimisticCars, addOptimisticCars] = useOptimistic<Car[]>(data);
 
@@ -81,17 +82,18 @@ export default function Cars({
   const [formSeller, setFormSeller] = useState("");
   const [formAdvantages, setFormAdvantages] = useState("");
   const [formDisadvantages, setFormDisadvantages] = useState("");
+  const [formIsSold, setFormIsSold] = useState(false);
 
-  function sortCars(optimisticCars: Car[], value: string) {
+  function sortCars(cars: Car[], value: string) {
     switch (value) {
       case "year":
         addOptimisticCars(
-          [...optimisticCars].sort((a, b) => Number(b.year) - Number(a.year)),
+          [...cars].sort((a, b) => Number(b.year) - Number(a.year)),
         );
         break;
       case "mileage":
         addOptimisticCars(
-          [...optimisticCars].sort(
+          [...cars].sort(
             (a, b) =>
               Number(a.mileage?.replace(" ", "")) -
               Number(b.mileage?.replace(" ", "")),
@@ -100,7 +102,7 @@ export default function Cars({
         break;
       case "price":
         addOptimisticCars(
-          [...optimisticCars].sort((a, b) => {
+          [...cars].sort((a, b) => {
             if (isNaN(Number(a.price?.replace(" ", "")))) return 1;
             if (isNaN(Number(b.price?.replace(" ", "")))) return -1;
             return (
@@ -112,7 +114,7 @@ export default function Cars({
         break;
       case "created_at":
         addOptimisticCars(
-          [...optimisticCars].sort(
+          [...cars].sort(
             (a, b) => b.created_at!.valueOf() - a.created_at!.valueOf(),
           ),
         );
@@ -123,27 +125,34 @@ export default function Cars({
   }
 
   function filterCars() {
-    if (filterState === "Все продавцы") {
-      const filtered = [...data].filter((car: Car) =>
-        car.name.toLowerCase().includes(inputState.toLowerCase()),
+    let shownCars;
+    if (!showSoldCars) {
+      shownCars = [...data].filter((car: Car) => !car.isSold);
+    } else {
+      shownCars = [...data];
+    }
+    if (filter === "Все продавцы") {
+      const filtered = [...shownCars].filter((car: Car) =>
+        car.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       return filtered;
     } else {
-      const filtered = [...data].filter(
+      const filtered = [...shownCars].filter(
         (car: Car) =>
-          car.seller === filterState &&
-          car.name.toLowerCase().includes(inputState.toLowerCase()),
+          car.seller === filter &&
+          car.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       return filtered;
     }
   }
 
   function resetFilters() {
-    setInputState("");
+    setSearchQuery("");
     searchRef!.current!.value = "";
-    setFilterState("Все продавцы");
-    setSortState("created_at");
+    setFilter("Все продавцы");
+    setSort("created_at");
     addOptimisticCars(data);
+    setShowSoldCars(false);
   }
 
   async function handleAddCar() {
@@ -179,6 +188,7 @@ export default function Cars({
       seller: formSeller,
       advantages: formAdvantages,
       disadvantages: formDisadvantages,
+      isSold: formIsSold,
     });
     setFormName("");
     setFormYear("");
@@ -189,13 +199,14 @@ export default function Cars({
     setFormSeller("");
     setFormAdvantages("");
     setFormDisadvantages("");
+    setFormIsSold(false);
   }
 
   useEffect(() => {
     const filteredCars = filterCars();
-    sortCars(filteredCars, sortState);
+    sortCars(filteredCars, sort);
     // // eslint-disable-next-line
-  }, [sortState, inputState, filterState]);
+  }, [sort, searchQuery, filter, showSoldCars]);
 
   return (
     <>
@@ -276,7 +287,7 @@ export default function Cars({
               Добавить автомобиль
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-fit">
             <DialogHeader>
               <DialogTitle>Добавить автомобиль</DialogTitle>
               <DialogDescription>
@@ -433,13 +444,13 @@ export default function Cars({
         <div className="relative h-fit w-full max-w-md">
           <Input
             type="text"
-            value={inputState}
+            value={searchQuery}
             placeholder="Поиск по названию"
             className="mb-3 w-full max-w-md pl-9"
             ref={searchRef}
             onChange={(e) => {
-              setInputState(e.target.value);
-              if (filterState === "Все продавцы") {
+              setSearchQuery(e.target.value);
+              if (filter === "Все продавцы") {
                 const filtered = [...data].filter((car: Car) =>
                   car.name.toLowerCase().includes(e.target.value.toLowerCase()),
                 );
@@ -450,7 +461,7 @@ export default function Cars({
                     car.name
                       .toLowerCase()
                       .includes(e.target.value.toLowerCase()) &&
-                    car.seller === filterState,
+                    car.seller === filter,
                 );
                 addOptimisticCars(filtered);
               }
@@ -476,12 +487,12 @@ export default function Cars({
               className="absolute right-3 top-3 text-gray-500"
               onClick={() => {
                 searchRef!.current!.value = "";
-                setInputState("");
-                if (filterState === "Все продавцы") {
+                setSearchQuery("");
+                if (filter === "Все продавцы") {
                   addOptimisticCars(data);
                 } else {
                   addOptimisticCars(
-                    [...data].filter((car: Car) => car.seller === filterState),
+                    [...data].filter((car: Car) => car.seller === filter),
                   );
                 }
               }}
@@ -506,9 +517,9 @@ export default function Cars({
         </div>
         {/* Filter */}
         <Select
-          value={filterState}
+          value={filter}
           defaultValue="Все продавцы"
-          onValueChange={(value) => setFilterState(value)}
+          onValueChange={(value) => setFilter(value)}
         >
           <SelectTrigger className="relative mb-3 w-full max-w-md pl-9">
             <svg
@@ -541,21 +552,21 @@ export default function Cars({
         </Select>
         {/* Sort */}
         <Select
-          value={sortState}
+          value={sort}
           defaultValue="created_at"
           onValueChange={(value) => {
             switch (value) {
               case "created_at":
-                setSortState("created_at");
+                setSort("created_at");
                 break;
               case "year":
-                setSortState("year");
+                setSort("year");
                 break;
               case "mileage":
-                setSortState("mileage");
+                setSort("mileage");
                 break;
               case "price":
-                setSortState("price");
+                setSort("price");
                 break;
               default:
                 break;
@@ -591,6 +602,17 @@ export default function Cars({
             <SelectItem value="price">по цене</SelectItem>
           </SelectContent>
         </Select>
+        {/* Show sold cars */}
+        <div className="mx-auto mb-6 flex w-fit items-center gap-1.5">
+          <Input
+            id="show-sold"
+            className="w-fit accent-black"
+            type="checkbox"
+            checked={showSoldCars}
+            onChange={() => setShowSoldCars(!showSoldCars)}
+          />
+          <Label htmlFor="show-sold">Показать проданные автомобили</Label>
+        </div>
         {/* Reset filters */}
         <Button
           className="mb-6 w-full max-w-md"
@@ -622,7 +644,20 @@ export default function Cars({
         className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3"
       >
         {optimisticCars?.map((car: any) => (
-          <li key={car.id} className="flex w-full flex-col pb-3">
+          <motion.li
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: 1,
+              transition: {
+                duration: 0.5,
+                type: "tween",
+                ease: "easeOut",
+              },
+            }}
+            // exit={{ opacity: 0 }}
+            key={car.id}
+            className="flex w-full flex-col pb-3"
+          >
             <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md bg-gray-100 shadow-sm">
               {car.image && (
                 <Image
@@ -653,6 +688,7 @@ export default function Cars({
                       setFormSeller(car.seller);
                       setFormAdvantages(car.advantages);
                       setFormDisadvantages(car.disadvantages);
+                      setFormIsSold(car.isSold);
                     }}
                   >
                     <svg
@@ -670,7 +706,7 @@ export default function Cars({
                     </svg>
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-fit">
                   <DialogHeader>
                     <DialogTitle>Изменить данные</DialogTitle>
                     {/* <DialogDescription>
@@ -817,6 +853,17 @@ export default function Cars({
                         placeholder="через запятую"
                       />
                     </div>
+                    <div className="mx-auto mb-6 flex w-fit items-center gap-1.5">
+                      <Input
+                        id="is-sold"
+                        className="w-fit accent-black"
+                        type="checkbox"
+                        defaultChecked={car.isSold}
+                        checked={formIsSold}
+                        onChange={() => setFormIsSold(!formIsSold)}
+                      />
+                      <Label htmlFor="is-sold">Автомобиль продан</Label>
+                    </div>
                   </div>
                   <DialogFooter>
                     <AlertDialog>
@@ -901,7 +948,7 @@ export default function Cars({
               )}
               {car.link && <ExternalLink url={car.link} />}
             </div>
-          </li>
+          </motion.li>
         ))}
       </motion.ul>
     </>

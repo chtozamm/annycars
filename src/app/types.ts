@@ -10,4 +10,5 @@ type Car = {
   image?: string | null;
   price?: string | null;
   mileage?: string | null;
+  isSold?: boolean;
 };

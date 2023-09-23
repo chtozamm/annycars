@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import Cars from "./cars";
 
-import { prisma } from "../../prisma";
+import prisma from "../../prisma";
 export const revalidate = 1;
 
 export default async function Home() {
@@ -55,6 +55,7 @@ export default async function Home() {
         seller: car.seller || "",
         advantages: car.advantages || "",
         disadvantages: car.disadvantages || "",
+        isSold: car.isSold,
       },
       where: {
         id: car.id,
