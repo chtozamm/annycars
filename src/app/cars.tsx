@@ -102,7 +102,7 @@ export default function Cars({ data }: { data: Car[] }) {
   function sortCars(a: Car, b: Car, key: string) {
     switch (key) {
       case "created_at":
-        return Number(a.created_at) - Number(b.created_at);
+        return Number(b.created_at) - Number(a.created_at);
       case "year":
         return Number(b.year) - Number(a.year);
       case "price":
@@ -142,18 +142,11 @@ export default function Cars({ data }: { data: Car[] }) {
               Добавить автомобиль
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-h-screen min-w-fit overflow-y-auto">
+          <DialogContent className="max-h-screen min-w-fit overflow-y-auto sm:max-h-[95vh]">
             <DialogHeader>
               <DialogTitle>Добавить автомобиль</DialogTitle>
             </DialogHeader>
             <AddCarForm router={router} />
-            {/* <DialogFooter>
-              <DialogClose>
-                <Button type="submit" onClick={() => null}>
-                  Добавить
-                </Button>
-              </DialogClose>
-            </DialogFooter> */}
           </DialogContent>
         </Dialog>
 
@@ -302,7 +295,7 @@ export default function Cars({ data }: { data: Car[] }) {
                       <EditIcon />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-h-screen min-w-fit overflow-y-auto">
+                  <DialogContent className="max-h-screen min-w-fit overflow-y-auto sm:max-h-[95vh]">
                     <DialogHeader>
                       <DialogTitle>Изменить данные</DialogTitle>
                     </DialogHeader>
@@ -575,13 +568,13 @@ export function UpdateCarForm({
     defaultValues: {
       name: car.name,
       year: car.year,
-      link: car.link,
-      image: car.image,
-      price: car.price,
-      mileage: car.mileage,
+      link: car.link || "",
+      image: car.image || "",
+      price: car.price || "",
+      mileage: car.mileage || "",
       seller: car.seller,
-      advantages: car.advantages,
-      disadvantages: car.disadvantages,
+      advantages: car.advantages || "",
+      disadvantages: car.disadvantages || "",
       isSold: car.isSold,
     },
   });

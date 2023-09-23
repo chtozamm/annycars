@@ -4,11 +4,11 @@ type Car = {
   name: string;
   year: string;
   seller: string;
-  link?: string | undefined;
-  advantages?: string | undefined;
-  disadvantages?: string | undefined;
-  image?: string | undefined;
-  price?: string | undefined;
-  mileage?: string | undefined;
+  link?: string | null;
+  advantages?: string | null;
+  disadvantages?: string | null;
+  image?: string | null;
+  price?: string | null;
+  mileage?: string | null;
   isSold?: boolean;
 };
