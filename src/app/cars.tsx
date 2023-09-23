@@ -77,6 +77,7 @@ import {
   SearchIcon,
   SortIcon,
   EditIcon,
+  XIcon,
 } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -151,7 +152,7 @@ export default function Cars({ data }: { data: Car[] }) {
         </Dialog>
 
         {/* Search */}
-        <div className="relative mt-3 h-fit w-full">
+        <div className="relative mt-3 flex h-fit w-full items-center">
           <Input
             type="text"
             value={searchQuery}
@@ -160,6 +161,14 @@ export default function Cars({ data }: { data: Car[] }) {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <SearchIcon />
+          {searchQuery && (
+            <button
+              className="absolute right-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-zinc-950 dark:focus-visible:ring-zinc-300"
+              onClick={() => setSearchQuery("")}
+            >
+              <XIcon />
+            </button>
+          )}
         </div>
         {/* Filter by seller */}
         <Select
