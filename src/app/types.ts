@@ -1,5 +1,5 @@
 type Car = {
-  id: bigint;
+  id: string;
   created_at: Date;
   name: string;
   year: string;

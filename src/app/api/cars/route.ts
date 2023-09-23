@@ -2,11 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "../../../../prisma";
 import { revalidatePath } from "next/cache";
 
-BigInt.prototype.toJSON = function () {
-  const int = Number.parseInt(this.toString());
-  return int ?? this.toString();
-};
-
 export async function GET() {
   const data =
     (await prisma.cars.findMany({

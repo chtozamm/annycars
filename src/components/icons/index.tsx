@@ -107,7 +107,6 @@ export function PlusIcon() {
   return (
     <svg
       className="mt-1.5 h-2 w-2"
-      data-testid="geist-icon"
       fill="none"
       height="24"
       shapeRendering="geometricPrecision"
@@ -128,7 +127,6 @@ export function MinusIcon() {
   return (
     <svg
       className="mt-1.5 h-2 w-2"
-      data-testid="geist-icon"
       fill="none"
       height="24"
       shapeRendering="geometricPrecision"
@@ -166,14 +164,13 @@ export function XIcon() {
   return (
     <svg
       className="h-4 w-4"
-      data-testid="geist-icon"
       fill="none"
       height="24"
-      shape-rendering="geometricPrecision"
+      shapeRendering="geometricPrecision"
       stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
       viewBox="0 0 24 24"
       width="24"
     >
