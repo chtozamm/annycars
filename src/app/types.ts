@@ -1,14 +1,14 @@
 type Car = {
-  id?: bigint;
-  created_at?: Date;
+  id: bigint;
+  created_at: Date;
   name: string;
-  year?: string | null;
-  seller?: string | null;
-  link?: string | null;
-  advantages?: string | null;
-  disadvantages?: string | null;
-  image?: string | null;
-  price?: string | null;
-  mileage?: string | null;
+  year: string;
+  seller: string;
+  link?: string | undefined;
+  advantages?: string | undefined;
+  disadvantages?: string | undefined;
+  image?: string | undefined;
+  price?: string | undefined;
+  mileage?: string | undefined;
   isSold?: boolean;
 };

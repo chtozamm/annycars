@@ -1,17 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import {
-  useState,
-  useRef,
-  useEffect,
-  experimental_useOptimistic as useOptimistic,
-} from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const arrayRange = (start: number, stop: number, step: number) =>
+  Array.from(
+    { length: (stop - start) / step + 1 },
+    (value, index) => start + index * step,
+  );
+
+const years = arrayRange(2000, new Date(Date.now()).getFullYear(), 1);
+
+const formSchema = z.object({
+  name: z.string().nonempty({ message: "Введите название" }),
+  year: z.string().length(4, { message: "Выберите год" }),
+  link: z.string(),
+  image: z.string(),
+  price: z.string(),
+  mileage: z.string(),
+  seller: z.string().nonempty({ message: "Укажите продавца" }),
+  advantages: z.string(),
+  disadvantages: z.string(),
+  isSold: z.boolean(),
+});
 
 // UI
 import ExternalLink from "@/components/externalLink";
-import { PlusIcon, MinusIcon, PersonIcon } from "@radix-ui/react-icons";
 import {
   Select,
   SelectContent,
@@ -42,19 +61,30 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { DialogClose } from "@radix-ui/react-dialog";
+import {
+  FilterIcon,
+  PlusSquareIcon,
+  PlusIcon,
+  MinusIcon,
+  SearchIcon,
+  SortIcon,
+  EditIcon,
+} from "@/components/icons";
+import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { Checkbox } from "@/components/ui/checkbox";
 
-export default function Cars({
-  data,
-  addCar,
-  updateCar,
-  deleteCar,
-}: {
-  data: Car[];
-  addCar: Function;
-  updateCar: Function;
-  deleteCar: Function;
-}) {
+export default function Cars({ data }: { data: Car[] }) {
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
@@ -64,485 +94,98 @@ export default function Cars({
   sellers.sort();
   sellersSet.clear();
 
+  const router = useRouter();
+
+  // Filters and sort key
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("Все продавцы");
+  const [filter, setFilter] = useState("");
   const [sort, setSort] = useState("created_at");
-  const [isLoading, setLoading] = useState(true);
-  const searchRef = useRef<HTMLInputElement>(null);
   const [showSoldCars, setShowSoldCars] = useState(false);
 
-  const [optimisticCars, addOptimisticCars] = useOptimistic<Car[]>(data);
-
-  const [formName, setFormName] = useState("");
-  const [formYear, setFormYear] = useState("");
-  const [formLink, setFormLink] = useState("");
-  const [formImage, setFormImage] = useState("");
-  const [formPrice, setFormPrice] = useState("");
-  const [formMileage, setFormMileage] = useState("");
-  const [formSeller, setFormSeller] = useState("");
-  const [formAdvantages, setFormAdvantages] = useState("");
-  const [formDisadvantages, setFormDisadvantages] = useState("");
-  const [formIsSold, setFormIsSold] = useState(false);
-
-  function sortCars(cars: Car[], value: string) {
-    switch (value) {
-      case "year":
-        addOptimisticCars(
-          [...cars].sort((a, b) => Number(b.year) - Number(a.year)),
-        );
-        break;
-      case "mileage":
-        addOptimisticCars(
-          [...cars].sort(
-            (a, b) =>
-              Number(a.mileage?.replace(" ", "")) -
-              Number(b.mileage?.replace(" ", "")),
-          ),
-        );
-        break;
-      case "price":
-        addOptimisticCars(
-          [...cars].sort((a, b) => {
-            if (isNaN(Number(a.price?.replace(" ", "")))) return 1;
-            if (isNaN(Number(b.price?.replace(" ", "")))) return -1;
-            return (
-              Number(a.price?.replace(" ", "")) -
-              Number(b.price?.replace(" ", ""))
-            );
-          }),
-        );
-        break;
+  function sortCars(a: Car, b: Car, key: string) {
+    switch (key) {
       case "created_at":
-        addOptimisticCars(
-          [...cars].sort(
-            (a, b) => b.created_at!.valueOf() - a.created_at!.valueOf(),
-          ),
+        return Number(a.created_at) - Number(b.created_at);
+      case "year":
+        return Number(b.year) - Number(a.year);
+      case "price":
+        if (!a.price) return 1;
+        if (!b.price) return -1;
+        return (
+          Number(a.price?.replace(" ", "")) - Number(b.price?.replace(" ", ""))
         );
-        break;
+      case "mileage":
+        if (!a.mileage) return 1;
+        if (!b.mileage) return -1;
+        return (
+          Number(a.mileage?.replace(" ", "")) -
+          Number(b.mileage?.replace(" ", ""))
+        );
       default:
-        break;
-    }
-  }
-
-  function filterCars() {
-    let shownCars;
-    if (!showSoldCars) {
-      shownCars = [...data].filter((car: Car) => !car.isSold);
-    } else {
-      shownCars = [...data];
-    }
-    if (filter === "Все продавцы") {
-      const filtered = [...shownCars].filter((car: Car) =>
-        car.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-      return filtered;
-    } else {
-      const filtered = [...shownCars].filter(
-        (car: Car) =>
-          car.seller === filter &&
-          car.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-      return filtered;
+        return 1;
     }
   }
 
   function resetFilters() {
     setSearchQuery("");
-    searchRef!.current!.value = "";
-    setFilter("Все продавцы");
+    setFilter("");
     setSort("created_at");
-    addOptimisticCars(data);
     setShowSoldCars(false);
   }
 
-  async function handleAddCar() {
-    await addCar({
-      name: formName,
-      year: formYear,
-      link: formLink,
-      image: formImage,
-      price: formPrice,
-      mileage: formMileage,
-      advantages: formAdvantages,
-      disadvantages: formDisadvantages,
-    });
-    setFormName("");
-    setFormYear("");
-    setFormLink("");
-    setFormImage("");
-    setFormPrice("");
-    setFormMileage("");
-    setFormAdvantages("");
-    setFormDisadvantages("");
-  }
-
-  async function handleUpdateCar(car: Car) {
-    await updateCar({
-      ...car,
-      name: formName || car.name,
-      year: formYear,
-      link: formLink,
-      image: formImage,
-      price: formPrice,
-      mileage: formMileage,
-      seller: formSeller,
-      advantages: formAdvantages,
-      disadvantages: formDisadvantages,
-      isSold: formIsSold,
-    });
-    setFormName("");
-    setFormYear("");
-    setFormLink("");
-    setFormImage("");
-    setFormPrice("");
-    setFormMileage("");
-    setFormSeller("");
-    setFormAdvantages("");
-    setFormDisadvantages("");
-    setFormIsSold(false);
-  }
-
-  useEffect(() => {
-    const filteredCars = filterCars();
-    sortCars(filteredCars, sort);
-    // // eslint-disable-next-line
-  }, [sort, searchQuery, filter, showSoldCars]);
-
   return (
     <>
-      {/* Header */}
-      <motion.header
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: 1,
-          transition: {
-            duration: 0.8,
-            type: "tween",
-            ease: "easeOut",
-          },
-        }}
-        className="pointer-events-none flex h-20 w-full max-w-md cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold"
-      >
-        <svg
-          className="h-8 w-8"
-          fill="none"
-          height="24"
-          shapeRendering="geometricPrecision"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.5"
-          viewBox="0 0 24 24"
-          width="24"
-        >
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M12 2L2 19.7778H22L12 2Z"
-            fill="currentColor"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-        </svg>
-        annycars
-      </motion.header>
       {/* Container for actions */}
-      <motion.div
-        className="mx-auto flex w-full max-w-md flex-col justify-center"
-        initial={{ opacity: 0, y: "10px" }}
-        animate={{
-          opacity: 1,
-          y: "0px",
-          transition: {
-            duration: 0.8,
-            type: "tween",
-            ease: "easeOut",
-            delay: 0.5,
-          },
-        }}
-      >
+      <div className="flex w-full max-w-md flex-col gap-3">
         {/* Add new car */}
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              className="mb-6 flex items-center gap-1.5"
-              variant="outline"
-            >
-              <svg
-                className="mt-0.5 h-4 w-4"
-                fill="none"
-                height="24"
-                shapeRendering="geometricPrecision"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                viewBox="0 0 24 24"
-                width="24"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <path d="M12 8v8" />
-                <path d="M8 12h8" />
-              </svg>
+            <Button className="w-full items-center gap-1.5" variant="outline">
+              <PlusSquareIcon />
               Добавить автомобиль
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-fit">
+          <DialogContent className="max-h-screen min-w-fit overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Добавить автомобиль</DialogTitle>
-              <DialogDescription>
-                Необходимо добавить название и ссылку на объявление.
-              </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="name"
-                  className="break-words text-right"
-                >
-                  Название
-                </Label>
-                <Input
-                  id="name"
-                  className="col-span-3"
-                  required
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="year"
-                  className="break-words text-right"
-                >
-                  Год выпуска
-                </Label>
-                <Input
-                  id="year"
-                  className="col-span-3"
-                  value={formYear}
-                  onChange={(e) => setFormYear(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="link"
-                  className="break-words text-right"
-                >
-                  Объявление
-                </Label>
-                <Input
-                  id="link"
-                  className="col-span-3"
-                  placeholder="https://"
-                  required
-                  value={formLink}
-                  onChange={(e) => setFormLink(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="image"
-                  className="break-words text-right"
-                >
-                  Фото
-                </Label>
-                <Input
-                  id="image"
-                  className="col-span-3"
-                  placeholder="https://"
-                  value={formImage}
-                  onChange={(e) => setFormImage(e.target.value)}
-                />
-              </div>
-              <div className="relative grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="price"
-                  className="break-words text-right"
-                >
-                  Цена
-                </Label>
-                <Input
-                  id="price"
-                  className="col-span-3 pr-10"
-                  value={formPrice}
-                  onChange={(e) => setFormPrice(e.target.value)}
-                />
-                <span className="absolute right-4 top-2">₽</span>
-              </div>
-              <div className="relative grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="mileage"
-                  className="break-words text-right"
-                >
-                  Пробег
-                </Label>
-                <Input
-                  id="mileage"
-                  className="col-span-3 pr-10"
-                  value={formMileage}
-                  onChange={(e) => setFormMileage(e.target.value)}
-                />
-                <span className="absolute right-3 top-2">км</span>
-              </div>
-              <div className="relative grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="seller"
-                  className="break-words text-right"
-                >
-                  Продавец
-                </Label>
-                <Input
-                  id="seller"
-                  className="col-span-3"
-                  value={formSeller}
-                  onChange={(e) => setFormSeller(e.target.value)}
-                />
-              </div>
-              <div className="relative grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="advantages"
-                  className="break-words text-right"
-                >
-                  Преимущества
-                </Label>
-                <Input
-                  id="advantages"
-                  className="col-span-3"
-                  value={formAdvantages}
-                  onChange={(e) => setFormAdvantages(e.target.value)}
-                  placeholder="через запятую"
-                />
-              </div>
-              <div className="relative grid grid-cols-4 items-center gap-4">
-                <Label
-                  // htmlFor="disadvantages"
-
-                  className="break-words text-right"
-                >
-                  Недостатки
-                </Label>
-                <Input
-                  id="disadvantages"
-                  className="col-span-3"
-                  value={formDisadvantages}
-                  onChange={(e) => setFormDisadvantages(e.target.value)}
-                  placeholder="через запятую"
-                />
-              </div>
-            </div>
-            <DialogFooter>
+            <AddCarForm router={router} />
+            {/* <DialogFooter>
               <DialogClose>
-                <Button type="submit" onClick={() => handleAddCar()}>
+                <Button type="submit" onClick={() => null}>
                   Добавить
                 </Button>
               </DialogClose>
-            </DialogFooter>
+            </DialogFooter> */}
           </DialogContent>
         </Dialog>
+
         {/* Search */}
-        <div className="relative h-fit w-full max-w-md">
+        <div className="relative mt-3 h-fit w-full">
           <Input
             type="text"
             value={searchQuery}
             placeholder="Поиск по названию"
-            className="mb-3 w-full max-w-md pl-9"
-            ref={searchRef}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (filter === "Все продавцы") {
-                const filtered = [...data].filter((car: Car) =>
-                  car.name.toLowerCase().includes(e.target.value.toLowerCase()),
-                );
-                addOptimisticCars(filtered);
-              } else {
-                const filtered = [...data].filter(
-                  (car: Car) =>
-                    car.name
-                      .toLowerCase()
-                      .includes(e.target.value.toLowerCase()) &&
-                    car.seller === filter,
-                );
-                addOptimisticCars(filtered);
-              }
-            }}
+            className="w-full pl-9"
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <svg
-            fill="none"
-            height="24"
-            shapeRendering="geometricPrecision"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.6"
-            viewBox="0 0 24 24"
-            width="24"
-            className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
-          >
-            <path d="M11 17.25a6.25 6.25 0 110-12.5 6.25 6.25 0 010 12.5z" />
-            <path d="M16 16l4.5 4.5" />
-          </svg>
-          {searchRef?.current?.value && (
-            <button
-              className="absolute right-3 top-3 text-gray-500"
-              onClick={() => {
-                searchRef!.current!.value = "";
-                setSearchQuery("");
-                if (filter === "Все продавцы") {
-                  addOptimisticCars(data);
-                } else {
-                  addOptimisticCars(
-                    [...data].filter((car: Car) => car.seller === filter),
-                  );
-                }
-              }}
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                height="24"
-                shapeRendering="geometricPrecision"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.6"
-                viewBox="0 0 24 24"
-                width="24"
-              >
-                <path d="M18 6L6 18" />
-                <path d="M6 6l12 12" />
-              </svg>
-            </button>
-          )}
+          <SearchIcon />
         </div>
-        {/* Filter */}
+        {/* Filter by seller */}
         <Select
           value={filter}
-          defaultValue="Все продавцы"
+          defaultValue=""
           onValueChange={(value) => setFilter(value)}
         >
-          <SelectTrigger className="relative mb-3 w-full max-w-md pl-9">
-            <svg
-              className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
-              fill="none"
-              height="24"
-              shapeRendering="geometricPrecision"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.6"
-              viewBox="0 0 24 24"
-              width="24"
-            >
-              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
-            </svg>
+          <SelectTrigger className="relative w-full pl-9">
+            <FilterIcon />
             <SelectValue
               placeholder="Выбрать магазин"
               className="placeholder:text-gray-400"
             />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Все продавцы">Все продавцы</SelectItem>
+            <SelectItem value="">Все продавцы</SelectItem>
             {sellers.map((seller) => (
               <SelectItem key={seller} value={seller}>
                 {seller}
@@ -550,15 +193,12 @@ export default function Cars({
             ))}
           </SelectContent>
         </Select>
-        {/* Sort */}
+        {/* Sort cars */}
         <Select
           value={sort}
           defaultValue="created_at"
           onValueChange={(value) => {
             switch (value) {
-              case "created_at":
-                setSort("created_at");
-                break;
               case "year":
                 setSort("year");
                 break;
@@ -569,29 +209,14 @@ export default function Cars({
                 setSort("price");
                 break;
               default:
+                setSort("created_at");
                 break;
             }
           }}
         >
-          <SelectTrigger className="relative mb-6 w-full max-w-md pl-9">
-            <svg
-              className="pointer-events-none absolute left-3 top-3 h-4 w-4 select-none text-gray-500"
-              fill="none"
-              height="24"
-              shapeRendering="geometricPrecision"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.6"
-              viewBox="0 0 24 24"
-              width="24"
-            >
-              <path d="M15 18H3M21 6H3M17 12H3" />
-            </svg>
-            <SelectValue
-              placeholder="по дате добавления"
-              className="placeholder:text-gray-400"
-            />
+          <SelectTrigger className="relative w-full pl-9">
+            <SortIcon />
+            <SelectValue placeholder="по дате добавления" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem defaultChecked value="created_at">
@@ -602,8 +227,8 @@ export default function Cars({
             <SelectItem value="price">по цене</SelectItem>
           </SelectContent>
         </Select>
-        {/* Show sold cars */}
-        <div className="mx-auto mb-6 flex w-fit items-center gap-1.5">
+        {/* Toggle sold cars */}
+        <div className="mx-auto mb-3 mt-3 flex w-fit items-center gap-1.5">
           <Input
             id="show-sold"
             className="w-fit accent-black"
@@ -615,7 +240,6 @@ export default function Cars({
         </div>
         {/* Reset filters */}
         <Button
-          className="mb-6 w-full max-w-md"
           onDoubleClickCapture={(e) => {
             resetFilters();
           }}
@@ -627,339 +251,560 @@ export default function Cars({
         >
           Сбросить фильтры
         </Button>
-      </motion.div>
+      </div>
       {/* List of cars */}
-      <motion.ul
-        initial={{ opacity: 0, y: "10px" }}
-        animate={{
-          opacity: 1,
-          y: "0px",
-          transition: {
-            duration: 0.8,
-            type: "tween",
-            ease: "easeOut",
-            delay: 1,
-          },
-        }}
-        className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3"
-      >
-        {optimisticCars?.map((car: any) => (
-          <motion.li
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: 1,
-              transition: {
-                duration: 0.5,
-                type: "tween",
-                ease: "easeOut",
-              },
-            }}
-            // exit={{ opacity: 0 }}
-            key={car.id}
-            className="flex w-full flex-col pb-3"
-          >
-            <div className="relative mb-6 aspect-[8/5] w-full select-none overflow-hidden rounded-md bg-gray-100 shadow-sm">
-              {car.image && (
-                <Image
-                  src={car.image}
-                  fill
-                  className={`${
-                    car.isSold ? "brightness-90 saturate-0" : ""
-                  } bg-gray-200 object-cover transition-all duration-700 ease-in-out  ${
-                    isLoading ? "scale-110 blur-2xl" : "scale-100 blur-0"
-                  }`}
-                  alt=""
-                  onLoadingComplete={() => setLoading(false)}
-                />
-              )}
-            </div>
-            <p
-              className={`${
-                car.isSold ? "line-through" : ""
-              } flex items-center justify-between text-xl font-semibold`}
+      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3">
+        {data
+          ?.filter((car) => (filter ? car.seller === filter : true))
+          .filter((car) => (showSoldCars ? true : !car.isSold))
+          .filter((car) =>
+            car.name.toLocaleLowerCase().includes(searchQuery.toLowerCase()),
+          )
+          .sort((a, b) => sortCars(a, b, sort))
+          .map((car: any) => (
+            <motion.li
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: 1,
+                transition: {
+                  duration: 0.5,
+                  type: "tween",
+                  ease: "easeOut",
+                },
+              }}
+              key={car.id}
+              className="flex w-full flex-col pb-3"
             >
-              {car.name}, {car.year}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="text-gray-400"
-                    onClick={() => {
-                      setFormName(car.name);
-                      setFormYear(car.year);
-                      setFormLink(car.link);
-                      setFormImage(car.image);
-                      setFormPrice(car.price);
-                      setFormMileage(car.mileage);
-                      setFormSeller(car.seller);
-                      setFormAdvantages(car.advantages);
-                      setFormDisadvantages(car.disadvantages);
-                      setFormIsSold(car.isSold);
-                    }}
-                  >
-                    <svg
-                      fill="none"
-                      shapeRendering="geometricPrecision"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1"
-                      viewBox="0 0 24 24"
-                      className="h-6 w-6"
+              <div className="relative aspect-[8/5] w-full select-none overflow-hidden rounded-md bg-gray-100 shadow-md">
+                {car.image && (
+                  <Image
+                    src={car.image}
+                    fill
+                    sizes="384px"
+                    className={`${
+                      car.isSold ? "brightness-90 saturate-0" : ""
+                    } bg-gray-200 object-cover transition-all duration-700 ease-in-out
+                    `}
+                    alt=""
+                  />
+                )}
+              </div>
+              <p
+                className={`${
+                  car.isSold ? "line-through" : ""
+                } mt-3 flex items-center justify-between text-xl font-semibold`}
+              >
+                {car.name}, {car.year}
+                {/* Edit car info */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="w-full items-center gap-1.5"
+                      variant="outline"
                     >
-                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-fit">
-                  <DialogHeader>
-                    <DialogTitle>Изменить данные</DialogTitle>
-                    {/* <DialogDescription>
-                      Обязательными полями являются только &quot;Название&quot;
-                      и &quot;Ссылка на объявление&quot;.
-                    </DialogDescription> */}
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="name"
-                        className="break-words text-right"
-                      >
-                        Название
-                      </Label>
-                      <Input
-                        id="name"
-                        className="col-span-3"
-                        required
-                        defaultValue={car.name}
-                        onChange={(e) => setFormName(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="year"
-                        className="break-words text-right"
-                      >
-                        Год выпуска
-                      </Label>
-                      <Input
-                        id="year"
-                        className="col-span-3"
-                        defaultValue={car.year}
-                        onChange={(e) => setFormYear(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="link"
-                        className="break-words text-right"
-                      >
-                        Объявление
-                      </Label>
-                      <Input
-                        id="link"
-                        className="col-span-3"
-                        placeholder="https://"
-                        required
-                        defaultValue={car.link}
-                        onChange={(e) => setFormLink(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="image"
-                        className="break-words text-right"
-                      >
-                        Фото
-                      </Label>
-                      <Input
-                        id="image"
-                        className="col-span-3"
-                        placeholder="https://"
-                        defaultValue={car.image}
-                        onChange={(e) => setFormImage(e.target.value)}
-                      />
-                    </div>
-                    <div className="relative grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="price"
-                        className="break-words text-right"
-                      >
-                        Цена
-                      </Label>
-                      <Input
-                        id="price"
-                        className="col-span-3 pr-10"
-                        defaultValue={car.price}
-                        onChange={(e) => setFormPrice(e.target.value)}
-                      />
-                      <span className="absolute right-4 top-2">₽</span>
-                    </div>
-                    <div className="relative grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="mileage"
-
-                        className="break-words text-right"
-                      >
-                        Пробег
-                      </Label>
-                      <Input
-                        id="mileage"
-                        className="col-span-3 pr-10"
-                        defaultValue={car.mileage}
-                        onChange={(e) => setFormMileage(e.target.value)}
-                      />
-                      <span className="absolute right-3 top-2">км</span>
-                    </div>
-                    <div className="relative grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="seller"
-
-                        className="break-words text-right"
-                      >
-                        Продавец
-                      </Label>
-                      <Input
-                        id="seller"
-                        className="col-span-3"
-                        defaultValue={car.seller}
-                        onChange={(e) => setFormSeller(e.target.value)}
-                      />
-                    </div>
-                    <div className="relative grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="advantages"
-
-                        className="break-words text-right"
-                      >
-                        Преимущества
-                      </Label>
-                      <Input
-                        id="advantages"
-                        className="col-span-3"
-                        defaultValue={car.advantages}
-                        onChange={(e) => setFormAdvantages(e.target.value)}
-                        placeholder="через запятую"
-                      />
-                    </div>
-                    <div className="relative grid grid-cols-4 items-center gap-4">
-                      <Label
-                        // htmlFor="disadvantages"
-
-                        className="break-words text-right"
-                      >
-                        Недостатки
-                      </Label>
-                      <Input
-                        id="disadvantages"
-                        className="col-span-3"
-                        defaultValue={car.disadvantages}
-                        onChange={(e) => setFormDisadvantages(e.target.value)}
-                        placeholder="через запятую"
-                      />
-                    </div>
-                    <div className="mx-auto mb-6 flex w-fit items-center gap-1.5">
-                      <Input
-                        id="is-sold"
-                        className="w-fit accent-black"
-                        type="checkbox"
-                        defaultChecked={car.isSold}
-                        checked={formIsSold}
-                        onChange={() => setFormIsSold(!formIsSold)}
-                      />
-                      <Label htmlFor="is-sold">Автомобиль продан</Label>
-                    </div>
+                      <EditIcon />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-screen min-w-fit overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Изменить данные</DialogTitle>
+                    </DialogHeader>
+                    <UpdateCarForm car={car} router={router} />
+                  </DialogContent>
+                </Dialog>
+              </p>
+              <p className="w-full border-b pb-1"></p>
+              <p className="mt-1.5 flex items-center justify-between text-lg">
+                {car.price &&
+                  (isNaN(car.price.replace(" ", ""))
+                    ? car.price
+                    : car.price + " ₽")}
+                {car.mileage && (
+                  <span className="ml-auto text-sm text-gray-600">
+                    {car.mileage} км
+                  </span>
+                )}
+              </p>
+              <div className="mt-3 grid grid-cols-1 gap-6">
+                {/* Advantages */}
+                {car.advantages && (
+                  <div>
+                    <span className="text-base font-medium">Преимущества</span>
+                    <p className="flex flex-col">
+                      {car.advantages &&
+                        car.advantages.split(",").map((item: string) => (
+                          <span key={item} className="flex gap-1.5">
+                            <PlusIcon />
+                            {item.trim()}
+                          </span>
+                        ))}
+                    </p>
                   </div>
-                  <DialogFooter>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="mx-auto mt-3 w-fit sm:mx-0 sm:mt-0"
-                        >
-                          Удалить
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Вы уверены, что хотите удалить объявление?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            {car.name}, {car.year}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Отмена</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={async () => await deleteCar(car)}
-                          >
-                            Удалить
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    <DialogClose>
-                      <Button
-                        type="submit"
-                        onClick={() => handleUpdateCar(car)}
-                      >
-                        Сохранить
-                      </Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </p>
-            <p className="mb-1 w-full border-b pb-1"></p>
-            <p className="flex items-center justify-between text-lg">
-              {car.price &&
-                (isNaN(car.price.replace(" ", ""))
-                  ? car.price
-                  : car.price + " ₽")}
-              <span className="text-sm text-gray-600">{car.mileage} км</span>
-            </p>
-            <div className="mt-6 grid grid-cols-1 gap-6">
-              {/* Advantages */}
-              <div>
-                <span className="text-base font-medium">Преимущества</span>
-                <p className="mt-1 flex flex-col">
-                  {car.advantages &&
-                    car.advantages.split(",").map((item: string) => (
-                      <span key={item} className="flex gap-1.5">
-                        <PlusIcon className="mt-1.5 h-2 w-2" />
-                        {item.trim()}
-                      </span>
-                    ))}
-                </p>
+                )}
+                {/* Disadvantages */}
+                {car.disadvantages && (
+                  <div>
+                    <span className="text-base font-medium">Недостатки</span>
+                    <p className="flex flex-col">
+                      {car.disadvantages &&
+                        car.disadvantages.split(",").map((item: string) => (
+                          <span key={item} className="flex gap-1.5">
+                            <MinusIcon />
+                            {item.trim()}
+                          </span>
+                        ))}
+                    </p>
+                  </div>
+                )}
               </div>
-              {/* Disadvantages */}
-              <div>
-                <span className="text-base font-medium">Недостатки</span>
-                <p className="mt-1 flex flex-col">
-                  {car.disadvantages &&
-                    car.disadvantages.split(",").map((item: string) => (
-                      <span key={item} className="flex gap-1.5">
-                        <MinusIcon className="mt-1.5 h-2 w-2" />
-                        {item.trim()}
-                      </span>
-                    ))}
-                </p>
+              <div className="flex justify-between pt-6">
+                {car.seller && (
+                  <span className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    {car.seller}
+                  </span>
+                )}
+                {car.link && (
+                  <span className="ml-auto">
+                    <ExternalLink url={car.link} />
+                  </span>
+                )}
               </div>
-            </div>
-            <div className="mt-auto flex justify-between pt-6">
-              {car.seller && (
-                <span className="flex items-center gap-1 text-sm font-medium text-gray-400">
-                  <PersonIcon className="mt-0.5 h-4 w-4" />
-                  {car.seller}
-                </span>
-              )}
-              {car.link && <ExternalLink url={car.link} />}
-            </div>
-          </motion.li>
-        ))}
-      </motion.ul>
+            </motion.li>
+          ))}
+      </ul>
     </>
+  );
+}
+
+export function AddCarForm({ router }: { router: AppRouterInstance }) {
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      year: "",
+      link: "",
+      image: "",
+      price: "",
+      mileage: "",
+      seller: "",
+      advantages: "",
+      disadvantages: "",
+      isSold: false,
+    },
+  });
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+
+    fetch("https://annycars.online/api/cars", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    router.refresh();
+  }
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="after:text-red-600 after:content-['*']">
+                Название
+              </FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Марка и модель</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="year"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="after:text-red-600 after:content-['*']">
+                Год выпуска
+              </FormLabel>
+              <FormControl>
+                {/* <Input {...field} /> */}
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a verified email to display" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="max-h-[10rem] overflow-y-auto">
+                    {years.map((year: number) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="seller"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="after:text-red-600 after:content-['*']">
+                Продавец
+              </FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Название автосалона</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="link"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ссылка на объявление</FormLabel>
+              <FormControl>
+                <Input placeholder="https://..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Фото</FormLabel>
+              <FormControl>
+                <Input placeholder="https://..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Цена</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="mileage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Пробег</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="advantages"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Преимущества</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Через запятую</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="disadvantages"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Недостатки</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Через запятую</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end">
+          <DialogClose
+            disabled={!form.getValues().name || !form.getValues().year}
+          >
+            <Button type="submit">Добавить</Button>
+          </DialogClose>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+export function UpdateCarForm({
+  car,
+  router,
+}: {
+  car: Car;
+  router: AppRouterInstance;
+}) {
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: car.name,
+      year: car.year,
+      link: car.link,
+      image: car.image,
+      price: car.price,
+      mileage: car.mileage,
+      seller: car.seller,
+      advantages: car.advantages,
+      disadvantages: car.disadvantages,
+      isSold: car.isSold,
+    },
+  });
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    const request = { ...values, id: car.id };
+    fetch("https://annycars.online/api/cars", {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
+    router.refresh();
+  }
+
+  function handleDelete(car: Car) {
+    fetch("https://annycars.online/api/cars", {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(car),
+    });
+    router.refresh();
+  }
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Название</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Марка и модель</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="year"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Год выпуска</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  {...field}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a verified email to display" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="max-h-[10rem] overflow-y-auto">
+                    {years.map((year: number) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="seller"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Продавец</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Название автосалона</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="link"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ссылка на объявление</FormLabel>
+              <FormControl>
+                <Input placeholder="https://..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Фото</FormLabel>
+              <FormControl>
+                <Input placeholder="https://..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Цена</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="mileage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Пробег</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="advantages"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Преимущества</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Через запятую</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="disadvantages"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Недостатки</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>Через запятую</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="isSold"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-3">
+              <FormControl>
+                <div className="flex gap-1.5">
+                  <Input
+                    id="is-sold"
+                    className="w-fit accent-black"
+                    type="checkbox"
+                    defaultChecked={car.isSold}
+                    onChange={field.onChange}
+                  />
+                  <Label htmlFor="is-sold">Автомобиль продан</Label>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex items-center justify-end gap-3">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline">Удалить</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Вы уверены, что хотите удалить объявление?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {car.name}, {car.year}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Отмена</AlertDialogCancel>
+                <DialogClose>
+                  <AlertDialogAction onClick={() => handleDelete(car)}>
+                    Удалить
+                  </AlertDialogAction>
+                </DialogClose>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <DialogClose
+            disabled={!form.getValues().name || !form.getValues().year}
+          >
+            <Button type="submit">Сохранить</Button>
+          </DialogClose>
+        </div>
+      </form>
+    </Form>
   );
 }
