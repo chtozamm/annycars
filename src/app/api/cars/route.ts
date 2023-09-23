@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../../prisma";
+import { revalidatePath } from "next/cache";
 
 BigInt.prototype.toJSON = function () {
   const int = Number.parseInt(this.toString());
@@ -43,6 +44,8 @@ export async function POST(request: Request) {
     },
   });
 
+  revalidatePath("/");
+
   return NextResponse.json(res);
 }
 
@@ -55,6 +58,8 @@ export async function DELETE(request: Request) {
       id: data.id,
     },
   });
+
+  revalidatePath("/");
 
   return NextResponse.json(res);
 }
@@ -80,6 +85,8 @@ export async function PUT(request: Request) {
       id: data.id,
     },
   });
+
+  revalidatePath("/");
 
   return NextResponse.json(res);
 }
