@@ -54,8 +54,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -82,7 +80,6 @@ import {
 } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Cars({ data }: { data: Car[] }) {
   // Creates set and converts to array with unique sellers
