@@ -663,7 +663,9 @@ export default function Cars({
                 <Image
                   src={car.image}
                   fill
-                  className={`bg-gray-200 object-cover transition-all duration-700 ease-in-out  ${
+                  className={`${
+                    car.isSold ? "brightness-90 saturate-0" : ""
+                  } bg-gray-200 object-cover transition-all duration-700 ease-in-out  ${
                     isLoading ? "scale-110 blur-2xl" : "scale-100 blur-0"
                   }`}
                   alt=""
@@ -671,7 +673,11 @@ export default function Cars({
                 />
               )}
             </div>
-            <p className="flex items-center justify-between text-xl font-semibold">
+            <p
+              className={`${
+                car.isSold ? "line-through" : ""
+              } flex items-center justify-between text-xl font-semibold`}
+            >
               {car.name}, {car.year}
               <Dialog>
                 <DialogTrigger asChild>
@@ -868,7 +874,10 @@ export default function Cars({
                   <DialogFooter>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="outline" className="mt-3 sm:mt-0">
+                        <Button
+                          variant="outline"
+                          className="mx-auto mt-3 w-fit sm:mx-0 sm:mt-0"
+                        >
                           Удалить
                         </Button>
                       </AlertDialogTrigger>
