@@ -2,7 +2,7 @@ import Cars from "./cars";
 import Header from "@/components/header";
 
 export default async function Home() {
-  const res = await fetch("https://annycars.online/api/cars", {
+  const res = await fetch("https://annycars.vercel.app/api/cars", {
     cache: "no-store",
   });
   const data = await res.json();

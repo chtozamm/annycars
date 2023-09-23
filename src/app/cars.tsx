@@ -296,8 +296,8 @@ export default function Cars({ data }: { data: Car[] }) {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button
-                      className="w-full items-center gap-1.5"
-                      variant="outline"
+                      className="w-fit items-center gap-1.5 text-gray-300"
+                      variant="ghost"
                     >
                       <EditIcon />
                     </Button>
@@ -394,7 +394,7 @@ export function AddCarForm({ router }: { router: AppRouterInstance }) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
-    fetch("https://annycars.online/api/cars", {
+    fetch("https://annycars.vercel.app/api/cars", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -589,7 +589,7 @@ export function UpdateCarForm({
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     const request = { ...values, id: car.id };
-    fetch("https://annycars.online/api/cars", {
+    fetch("https://annycars.vercel.app/api/cars", {
       method: "PUT",
       headers: {
         "Content-type": "application/json",
@@ -600,7 +600,7 @@ export function UpdateCarForm({
   }
 
   function handleDelete(car: Car) {
-    fetch("https://annycars.online/api/cars", {
+    fetch("https://annycars.vercel.app/api/cars", {
       method: "DELETE",
       headers: {
         "Content-type": "application/json",
