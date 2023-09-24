@@ -37,6 +37,7 @@ export default async function Home() {
         seller: car.seller,
         advantages: car.advantages || "",
         disadvantages: car.disadvantages || "",
+        isSold: car.isSold,
       },
       where: {
         id: id,
