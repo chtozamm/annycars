@@ -44,7 +44,6 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { formSchema } from "@/lib/zod";
 import { EditIcon, PlusSquareIcon } from "@/components/icons";
-import { randomUUID } from "crypto";
 
 export function AddCarForm({
   router,
@@ -76,9 +75,8 @@ export function AddCarForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    const uuid = Math.random().toString();
-    console.log([...optimisticCars, { ...values, id: uuid }]);
-    addOptimisticCars([...optimisticCars, values]);
+    // const uuid = Math.random().toString();
+    // addOptimisticCars(values);
     // await fetch("https://annycars.vercel.app/api/cars", {
     //   method: "POST",
     //   headers: {
@@ -86,8 +84,8 @@ export function AddCarForm({
     //   },
     //   body: JSON.stringify(values),
     // });
-    router.refresh();
     await addCar(values);
+    router.refresh();
   }
 
   const arrayRange = (start: number, stop: number, step: number) =>
@@ -272,9 +270,17 @@ export function AddCarForm({
 export function UpdateCarForm({
   car,
   router,
+  deleteCar,
+  updateCar,
+  optimisticCars,
+  addOptimisticCars,
 }: {
   car: Car;
   router: AppRouterInstance;
+  deleteCar: Function;
+  updateCar: Function;
+  optimisticCars: Car[];
+  addOptimisticCars: Function;
 }) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -295,26 +301,33 @@ export function UpdateCarForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    const request = { ...values, id: car.id };
-    // addCarsOptimistic([...carsOptimistic, values]);
-    await fetch("https://annycars.vercel.app/api/cars", {
-      method: "PUT",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(request),
-    });
+    // const request = { ...values, id: car.id };
+    // addOptimisticCars([...optimisticCars, values]);
+    // await fetch("https://annycars.vercel.app/api/cars", {
+    //   method: "PUT",
+    //   headers: {
+    //     "Content-type": "application/json",
+    //   },
+    //   body: JSON.stringify(request),
+    // });
+    await updateCar(car.id, values);
     router.refresh();
   }
 
   async function handleDelete(car: Car) {
-    await fetch("https://annycars.vercel.app/api/cars", {
-      method: "DELETE",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(car),
-    });
+    // await fetch("https://annycars.vercel.app/api/cars", {
+    //   method: "DELETE",
+    //   headers: {
+    //     "Content-type": "application/json",
+    //   },
+    //   body: JSON.stringify(car),
+    // });
+
+    // addOptimisticCars(
+    //   [...optimisticCars].filter((current) => current.id !== car.id),
+    // );
+
+    await deleteCar(car);
     router.refresh();
   }
 

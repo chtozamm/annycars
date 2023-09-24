@@ -29,13 +29,17 @@ import {
 export default function Cars({
   data,
   addCar,
+  deleteCar,
+  updateCar,
 }: {
   data: Car[];
   addCar: Function;
+  deleteCar: Function;
+  updateCar: Function;
 }) {
-  const [optimisticCars, addOptimisticCars] = useOptimistic<Car[]>(
+  const [optimisticCars, addOptimisticCars] = useOptimistic(
     data,
-    // (state: Car[], newCar: Car) => [...state, newCar],
+    (state: Car[], newCar: Car) => [...state, newCar],
   );
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
@@ -200,12 +204,15 @@ export default function Cars({
       <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3">
         {optimisticCars
           ?.filter((car) => (filter ? car.seller === filter : true))
-          .filter((car) => (showSoldCars ? true : !car.isSold))
-          .filter((car) =>
-            car.name.toLocaleLowerCase().includes(searchQuery.toLowerCase()),
+          ?.filter((car) => (showSoldCars ? true : !car.isSold))
+          ?.filter(
+            (car) =>
+              car.name
+                ?.toLocaleLowerCase()
+                ?.includes(searchQuery?.toLowerCase()),
           )
-          .sort((a, b) => sortCars(a, b, sort))
-          .map((car: any) => (
+          ?.sort((a, b) => sortCars(a, b, sort))
+          ?.map((car: any) => (
             <motion.li
               initial={{ opacity: 0 }}
               animate={{
@@ -240,7 +247,14 @@ export default function Cars({
               >
                 {car.name}, {car.year}
                 {/* Edit car info */}
-                <UpdateCarForm car={car} router={router} />
+                <UpdateCarForm
+                  car={car}
+                  router={router}
+                  deleteCar={deleteCar}
+                  updateCar={updateCar}
+                  optimisticCars={optimisticCars}
+                  addOptimisticCars={addOptimisticCars}
+                />
               </p>
               <p className="w-full border-b pb-1"></p>
               <p className="mt-1.5 flex items-center justify-between text-lg">
