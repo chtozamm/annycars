@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useState, experimental_useOptimistic as useOptimistic } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { AddCarForm, UpdateCarForm } from "./forms";
 
@@ -37,10 +36,11 @@ export default function Cars({
   deleteCar: Function;
   updateCar: Function;
 }) {
-  const [optimisticCars, addOptimisticCars] = useOptimistic(
-    data,
-    (state: Car[], newCar: Car) => [...state, newCar],
-  );
+  // const [optimisticCars, addOptimisticCars] = useOptimistic(
+  //   data,
+  //   (state: Car[], newCar: Car) => [...state, newCar],
+  // );
+
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
@@ -49,8 +49,6 @@ export default function Cars({
   sellersSet.forEach((seller) => sellers.push(seller as string));
   sellers.sort();
   sellersSet.clear();
-
-  const router = useRouter();
 
   // Filters and sort key
   const [searchQuery, setSearchQuery] = useState("");
@@ -94,12 +92,7 @@ export default function Cars({
       {/* Container for actions */}
       <div className="flex w-full max-w-md flex-col gap-3">
         {/* Add new car */}
-        <AddCarForm
-          optimisticCars={optimisticCars}
-          addOptimisticCars={addOptimisticCars}
-          router={router}
-          addCar={addCar}
-        />
+        <AddCarForm addCar={addCar} />
         {/* Search */}
         <div className="relative mt-3 flex h-fit w-full items-center">
           <Input
@@ -202,7 +195,7 @@ export default function Cars({
       </div>
       {/* List of cars */}
       <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3">
-        {optimisticCars
+        {data
           ?.filter((car) => (filter ? car.seller === filter : true))
           ?.filter((car) => (showSoldCars ? true : !car.isSold))
           ?.filter(
@@ -249,11 +242,8 @@ export default function Cars({
                 {/* Edit car info */}
                 <UpdateCarForm
                   car={car}
-                  router={router}
                   deleteCar={deleteCar}
                   updateCar={updateCar}
-                  optimisticCars={optimisticCars}
-                  addOptimisticCars={addOptimisticCars}
                 />
               </p>
               <p className="w-full border-b pb-1"></p>

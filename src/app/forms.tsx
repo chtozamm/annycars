@@ -41,21 +41,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { formSchema } from "@/lib/zod";
 import { EditIcon, PlusSquareIcon } from "@/components/icons";
 
-export function AddCarForm({
-  router,
-  optimisticCars,
-  addOptimisticCars,
-  addCar,
-}: {
-  router: AppRouterInstance;
-  optimisticCars: Car[];
-  addOptimisticCars: Function;
-  addCar: Function;
-}) {
+export function AddCarForm({ addCar }: { addCar: Function }) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -269,18 +258,12 @@ export function AddCarForm({
 
 export function UpdateCarForm({
   car,
-  router,
   deleteCar,
   updateCar,
-  optimisticCars,
-  addOptimisticCars,
 }: {
   car: Car;
-  router: AppRouterInstance;
   deleteCar: Function;
   updateCar: Function;
-  optimisticCars: Car[];
-  addOptimisticCars: Function;
 }) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
