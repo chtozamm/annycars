@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, experimental_useOptimistic as useOptimistic } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 
@@ -83,6 +83,8 @@ import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export default function Cars({ data }: { data: Car[] }) {
+  const [carsOptimistic, addCarsOptimistic] = useOptimistic<Car[]>(data);
+
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
@@ -392,11 +394,11 @@ export function AddCarForm({ router }: { router: AppRouterInstance }) {
       isSold: false,
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
-    fetch("https://annycars.vercel.app/api/cars", {
+    await fetch("https://annycars.vercel.app/api/cars", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -587,11 +589,11 @@ export function UpdateCarForm({
       isSold: car.isSold,
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     const request = { ...values, id: car.id };
-    fetch("https://annycars.vercel.app/api/cars", {
+    await fetch("https://annycars.vercel.app/api/cars", {
       method: "PUT",
       headers: {
         "Content-type": "application/json",
@@ -601,8 +603,8 @@ export function UpdateCarForm({
     router.refresh();
   }
 
-  function handleDelete(car: Car) {
-    fetch("https://annycars.vercel.app/api/cars", {
+  async function handleDelete(car: Car) {
+    await fetch("https://annycars.vercel.app/api/cars", {
       method: "DELETE",
       headers: {
         "Content-type": "application/json",
