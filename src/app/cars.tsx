@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, experimental_useOptimistic as useOptimistic } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 
@@ -83,8 +83,6 @@ import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export default function Cars({ data }: { data: Car[] }) {
-  const [carsOptimistic, addCarsOptimistic] = useOptimistic<Car[]>(data);
-
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
@@ -397,7 +395,6 @@ export function AddCarForm({ router }: { router: AppRouterInstance }) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-
     await fetch("https://annycars.vercel.app/api/cars", {
       method: "POST",
       headers: {
@@ -593,6 +590,7 @@ export function UpdateCarForm({
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     const request = { ...values, id: car.id };
+    // addCarsOptimistic([...carsOptimistic, values]);
     await fetch("https://annycars.vercel.app/api/cars", {
       method: "PUT",
       headers: {
