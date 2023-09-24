@@ -1,6 +1,6 @@
 type Car = {
-  id: string;
-  created_at: Date;
+  id?: string;
+  created_at?: Date;
   name: string;
   year: string;
   seller: string;

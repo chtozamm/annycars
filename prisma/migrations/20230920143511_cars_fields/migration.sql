@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE `cars` ADD COLUMN `image` VARCHAR(191) NULL,
-    ADD COLUMN `place` VARCHAR(191) NULL,
-    ADD COLUMN `year` INTEGER NULL,
-    MODIFY `name` VARCHAR(191) NULL;
