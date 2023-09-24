@@ -85,7 +85,7 @@ export function AddCarForm({
     //   body: JSON.stringify(values),
     // });
     await addCar(values);
-    router.refresh();
+    // router.refresh();
   }
 
   const arrayRange = (start: number, stop: number, step: number) =>
@@ -311,7 +311,7 @@ export function UpdateCarForm({
     //   body: JSON.stringify(request),
     // });
     await updateCar(car.id, values);
-    router.refresh();
+    // router.refresh();
   }
 
   async function handleDelete(car: Car) {
@@ -328,7 +328,7 @@ export function UpdateCarForm({
     // );
 
     await deleteCar(car);
-    router.refresh();
+    // router.refresh();
   }
 
   const arrayRange = (start: number, stop: number, step: number) =>
