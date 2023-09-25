@@ -86,18 +86,15 @@ export default function Cars({
   const router = useRouter();
 
   async function handleAdd(car: Car) {
-    await addCar(car);
-    router.refresh();
+    await addCar(car).then(() => router.refresh());
   }
 
   async function handleDelete(car: Car) {
-    await deleteCar(car);
-    router.refresh();
+    await deleteCar(car).then(() => router.refresh());
   }
 
   async function handleUpdate(car: Car, values: Car) {
-    await updateCar(car, values);
-    router.refresh();
+    await updateCar(car, values).then(() => router.refresh());
   }
 
   return (
