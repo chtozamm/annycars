@@ -43,7 +43,7 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { formSchema } from "@/lib/zod";
 import { EditIcon, PlusSquareIcon } from "@/components/icons";
 
-export function AddCarForm({ addCar }: { addCar: Function }) {
+export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,8 +72,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
     //   },
     //   body: JSON.stringify(values),
     // });
-    await addCar(values);
-    // router.refresh();
+    await handleAdd(values);
   }
 
   const arrayRange = (start: number, stop: number, step: number) =>
@@ -267,12 +266,12 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
 
 export function UpdateCarForm({
   car,
-  deleteCar,
-  updateCar,
+  handleDelete,
+  handleUpdate,
 }: {
   car: Car;
-  deleteCar: Function;
-  updateCar: Function;
+  handleDelete: Function;
+  handleUpdate: Function;
 }) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -293,34 +292,7 @@ export function UpdateCarForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    // const request = { ...values, id: car.id };
-    // addOptimisticCars([...optimisticCars, values]);
-    // await fetch("https://annycars.vercel.app/api/cars", {
-    //   method: "PUT",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //   },
-    //   body: JSON.stringify(request),
-    // });
-    await updateCar(car.id, values);
-    // router.refresh();
-  }
-
-  async function handleDelete(car: Car) {
-    // await fetch("https://annycars.vercel.app/api/cars", {
-    //   method: "DELETE",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //   },
-    //   body: JSON.stringify(car),
-    // });
-
-    // addOptimisticCars(
-    //   [...optimisticCars].filter((current) => current.id !== car.id),
-    // );
-
-    await deleteCar(car);
-    // router.refresh();
+    await handleUpdate(car.id, values);
   }
 
   const arrayRange = (start: number, stop: number, step: number) =>

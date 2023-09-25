@@ -24,6 +24,7 @@ import {
   SortIcon,
   XIcon,
 } from "@/components/icons";
+import { useRouter } from "next/navigation";
 
 export default function Cars({
   data,
@@ -82,12 +83,29 @@ export default function Cars({
     setShowSoldCars(false);
   }
 
+  const router = useRouter();
+
+  async function handleAdd(car: Car) {
+    await addCar(car);
+    router.refresh();
+  }
+
+  async function handleDelete(car: Car) {
+    await deleteCar(car);
+    router.refresh();
+  }
+
+  async function handleUpdate(car: Car, values: Car) {
+    await updateCar(car, values);
+    router.refresh();
+  }
+
   return (
     <>
       {/* Container for actions */}
       <div className="flex w-full max-w-md flex-col gap-3">
         {/* Add new car */}
-        <AddCarForm addCar={addCar} />
+        <AddCarForm handleAdd={handleAdd} />
         {/* Search */}
         <div className="relative mt-3 flex h-fit w-full items-center">
           <Input
@@ -237,8 +255,8 @@ export default function Cars({
                 {/* Edit car info */}
                 <UpdateCarForm
                   car={car}
-                  deleteCar={deleteCar}
-                  updateCar={updateCar}
+                  handleDelete={handleDelete}
+                  handleUpdate={handleUpdate}
                 />
               </p>
               <p className="w-full border-b pb-1"></p>
