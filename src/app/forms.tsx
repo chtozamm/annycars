@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -107,7 +106,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                     Название
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Марка и модель</FormDescription>
                   <FormMessage />
@@ -123,7 +122,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                     Год выпуска
                   </FormLabel>
                   <FormControl>
-                    {/* <Input {...field} /> */}
+                    {/* <Input autoComplete="off" {...field} /> */}
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -155,7 +154,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                     Продавец
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Название автосалона</FormDescription>
                   <FormMessage />
@@ -169,7 +168,11 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                 <FormItem>
                   <FormLabel>Ссылка на объявление</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} />
+                    <Input
+                      autoComplete="off"
+                      placeholder="https://..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -182,7 +185,11 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                 <FormItem>
                   <FormLabel>Фото</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} />
+                    <Input
+                      autoComplete="off"
+                      placeholder="https://..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -195,7 +202,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                 <FormItem>
                   <FormLabel>Цена</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -208,7 +215,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                 <FormItem>
                   <FormLabel>Пробег</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -221,7 +228,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                 <FormItem>
                   <FormLabel>Преимущества</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Через запятую</FormDescription>
                   <FormMessage />
@@ -235,7 +242,7 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
                 <FormItem>
                   <FormLabel>Недостатки</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Через запятую</FormDescription>
                   <FormMessage />
@@ -245,8 +252,10 @@ export function AddCarForm({ addCar }: { addCar: Function }) {
             <div className="flex justify-end">
               <DialogClose
                 disabled={!form.getValues().name || !form.getValues().year}
+                type="submit"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
               >
-                <Button type="submit">Добавить</Button>
+                Добавить
               </DialogClose>
             </div>
           </form>
@@ -344,7 +353,7 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Название</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Марка и модель</FormDescription>
                   <FormMessage />
@@ -361,7 +370,6 @@ export function UpdateCarForm({
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      {...field}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -388,7 +396,7 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Продавец</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Название автосалона</FormDescription>
                   <FormMessage />
@@ -402,7 +410,11 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Ссылка на объявление</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} />
+                    <Input
+                      autoComplete="off"
+                      placeholder="https://..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -415,7 +427,11 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Фото</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} />
+                    <Input
+                      autoComplete="off"
+                      placeholder="https://..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -428,7 +444,7 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Цена</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -441,7 +457,7 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Пробег</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -454,7 +470,7 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Преимущества</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Через запятую</FormDescription>
                   <FormMessage />
@@ -468,7 +484,7 @@ export function UpdateCarForm({
                 <FormItem>
                   <FormLabel>Недостатки</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>Через запятую</FormDescription>
                   <FormMessage />
@@ -483,6 +499,7 @@ export function UpdateCarForm({
                   <FormControl>
                     <div className="flex gap-1.5">
                       <Input
+                        autoComplete="off"
                         id="is-sold"
                         className="w-fit accent-black"
                         type="checkbox"
@@ -512,18 +529,22 @@ export function UpdateCarForm({
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Отмена</AlertDialogCancel>
-                    <DialogClose>
-                      <AlertDialogAction onClick={() => handleDelete(car)}>
-                        Удалить
-                      </AlertDialogAction>
+                    <DialogClose
+                      onClick={() => handleDelete(car)}
+                      // className="mt-2 sm:mt-0"
+                      className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
+                    >
+                      Удалить
                     </DialogClose>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
               <DialogClose
                 disabled={!form.getValues().name || !form.getValues().year}
+                type="submit"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
               >
-                <Button type="submit">Сохранить</Button>
+                Сохранить
               </DialogClose>
             </div>
           </form>

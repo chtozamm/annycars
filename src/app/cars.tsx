@@ -36,11 +36,6 @@ export default function Cars({
   deleteCar: Function;
   updateCar: Function;
 }) {
-  // const [optimisticCars, addOptimisticCars] = useOptimistic(
-  //   data,
-  //   (state: Car[], newCar: Car) => [...state, newCar],
-  // );
-
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
