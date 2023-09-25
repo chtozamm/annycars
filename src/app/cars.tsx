@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { AddCarForm } from "./forms";
 import useSWR from "swr";
@@ -54,15 +54,15 @@ export default function Cars({
   const pathname = usePathname();
   // Filters and sort key
   const searchParams = useSearchParams();
-  const filter = searchParams.get("filter") ?? "";
+  const filter = searchParams.get("filter") ?? "all";
   const sort = searchParams.get("sort") ?? "";
-  const searchQuery = searchParams.get("q") ?? "";
-  const sold_cars = searchParams.get("sold_cars") ?? "";
+  const [searchQuery, setSearchQuery] = useState("");
+  const sold = searchParams.get("sold") ?? "";
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
-  if (sold_cars === "true") {
+  if (sold === "true") {
     data.forEach((car: Car) => sellersSet.add(car.seller));
   } else {
     data
@@ -109,7 +109,8 @@ export default function Cars({
   );
 
   function resetFilters() {
-    router.push("/");
+    setSearchQuery("");
+    router.push("/", { scroll: false });
   }
 
   async function handleAdd(car: Car) {
@@ -131,21 +132,14 @@ export default function Cars({
             placeholder="Поиск по названию"
             className="w-full pl-9"
             onChange={(e) => {
-              router.replace(
-                pathname + "?" + createQueryString("q", e.target.value),
-                { scroll: false },
-              );
+              setSearchQuery(e.target.value);
             }}
           />
           <SearchIcon />
           {searchQuery && (
             <button
               className="absolute right-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-zinc-950 dark:focus-visible:ring-zinc-300"
-              onClick={() =>
-                router.replace(pathname + "?" + createQueryString("q", ""), {
-                  scroll: false,
-                })
-              }
+              onClick={() => setSearchQuery("")}
             >
               <XIcon />
             </button>
@@ -153,8 +147,7 @@ export default function Cars({
         </div>
         {/* Filter by seller */}
         <Select
-          value={filter}
-          defaultValue=""
+          value={filter || "all"}
           onValueChange={(value) =>
             router.push(pathname + "?" + createQueryString("filter", value), {
               scroll: false,
@@ -169,7 +162,7 @@ export default function Cars({
             />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Все продавцы</SelectItem>
+            <SelectItem value="all">Все продавцы</SelectItem>
             {sellers.map((seller) => (
               <SelectItem key={seller} value={seller}>
                 {seller}
@@ -179,6 +172,7 @@ export default function Cars({
         </Select>
         {/* Sort cars */}
         <Select
+          value={sort || "created_at"}
           onValueChange={(value) => {
             router.push(pathname + "?" + createQueryString("sort", value), {
               scroll: false,
@@ -204,15 +198,12 @@ export default function Cars({
             id="show-sold"
             className="w-fit accent-black"
             type="checkbox"
-            checked={sold_cars === "true"}
+            checked={sold === "true"}
             onChange={() =>
               router.push(
                 pathname +
                   "?" +
-                  createQueryString(
-                    "sold_cars",
-                    sold_cars === "true" ? "false" : "true",
-                  ),
+                  createQueryString("sold", sold === "true" ? "false" : "true"),
                 {
                   scroll: false,
                 },
@@ -223,7 +214,7 @@ export default function Cars({
         </div>
         {/* Reset filters */}
         <Button
-          onDoubleClickCapture={(e) => {
+          onClick={(e) => {
             resetFilters();
           }}
           onKeyDown={(e) => {
@@ -250,8 +241,8 @@ export default function Cars({
             </div>
           ))}
         {data
-          ?.filter((car) => (filter ? car.seller === filter : true))
-          ?.filter((car) => (sold_cars === "true" ? true : !car.isSold))
+          ?.filter((car) => (filter !== "all" ? car.seller === filter : true))
+          ?.filter((car) => (sold === "true" ? true : !car.isSold))
           ?.filter(
             (car) =>
               car.name
