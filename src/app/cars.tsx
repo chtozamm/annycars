@@ -5,6 +5,7 @@ import { useState, experimental_useOptimistic as useOptimistic } from "react";
 import { motion } from "framer-motion";
 import { AddCarForm, UpdateCarForm } from "./forms";
 import { useRouter } from "next/navigation";
+import useSWR from "swr";
 
 import ExternalLink from "@/components/externalLink";
 import {
@@ -27,7 +28,7 @@ import {
 } from "@/components/icons";
 
 export default function Cars({
-  data,
+  data: serverData,
   addCar,
   deleteCar,
   updateCar,
@@ -37,6 +38,11 @@ export default function Cars({
   deleteCar: Function;
   updateCar: Function;
 }) {
+  let data: Car[] = [];
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data: cars, mutate } = useSWR("/api/cars", fetcher);
+  if (cars) data = [...cars];
+
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
@@ -83,10 +89,14 @@ export default function Cars({
     setShowSoldCars(false);
   }
 
-  // const router = useRouter();
+  const router = useRouter();
 
   async function handleAdd(car: Car) {
-    await addCar(car);
+    await mutate(addCar(car), {
+      optimisticData: [...data, { ...car, id: Math.random() }],
+    });
+    // await addCar(car);
+    router.refresh();
   }
 
   async function handleDelete(car: Car) {
