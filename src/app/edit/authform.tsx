@@ -10,15 +10,18 @@ import { useRouter } from "next/navigation";
 export default function AuthForm() {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState({ password: "" });
+  const [disabled, setDisabled] = useState(false);
   const [error, setError] = useState(false);
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     // Validate inputs
+    setDisabled(true);
     const res = await signIn("credentials", {
       password: userInfo.password,
       redirect: false,
     });
     setUserInfo({ password: "" });
+    setDisabled(false);
     if (res?.error) setError(true);
     if (!res?.error) {
       setError(false);
@@ -37,6 +40,7 @@ export default function AuthForm() {
         onChange={(e) => setUserInfo({ password: e.target.value })}
         placeholder="Пароль"
         type="password"
+        disabled={disabled}
       />
       <Button type="submit" disabled={!userInfo.password}>
         Пройти
