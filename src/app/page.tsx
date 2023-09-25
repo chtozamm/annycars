@@ -65,7 +65,7 @@ export default async function Home() {
     }
   }
   return (
-    <main className="flex flex-col items-center justify-start px-6 pb-8">
+    <main className="mx-3 flex flex-col items-center justify-start px-6 pb-8">
       <HeaderMessage
         label="Редактировать объявления можно "
         keyword="здесь"

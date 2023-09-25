@@ -227,7 +227,7 @@ export default function Cars({
         </Button>
       </div>
       {/* List of cars */}
-      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3">
+      <ul className="mx-auto mt-8 grid w-full max-w-5xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3">
         {isLoading &&
           [1, 2, 3].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">

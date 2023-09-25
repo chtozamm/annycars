@@ -4,6 +4,7 @@ import AuthForm from "./authform";
 import Image from "next/image";
 import Cars from "./cars";
 import prisma from "../../../prisma";
+import { TriangleIcon } from "@/components/icons";
 
 export default async function EditPage() {
   const session = await getServerSession();
@@ -48,24 +49,25 @@ export default async function EditPage() {
     }
   }
   return (
-    <main className="flex flex-col items-center justify-start px-6 pb-8">
+    <main className="mx-3 flex flex-col items-center justify-start px-6 pb-8">
       <HeaderMessage label="Вернуться на " keyword="главную" link="/" />
-      <div className="mt-8 flex flex-col items-center justify-center gap-6 text-sm">
-        {/* <Menu /> */}
-        {!session && (
-          <>
-            <Image
-              src="/gandalf.png"
-              width={160}
-              height={160}
-              alt=""
-              className="pointer-events-none select-none"
-            />
-            <AuthForm />
-          </>
-        )}
-        {session && <Cars deleteCar={deleteCar} updateCar={updateCar} />}
-      </div>
+      <header className="flex h-20 cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold">
+        <TriangleIcon />
+        annycars
+      </header>
+      {!session && (
+        <div className="flex flex-col items-center justify-center gap-6 text-sm">
+          <Image
+            src="/gandalf.png"
+            width={160}
+            height={160}
+            alt=""
+            className="pointer-events-none select-none"
+          />
+          <AuthForm />
+        </div>
+      )}
+      {session && <Cars deleteCar={deleteCar} updateCar={updateCar} />}
     </main>
   );
 }

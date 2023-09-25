@@ -88,7 +88,7 @@ export default function Cars({
   return (
     <>
       {/* Toggle sold cars */}
-      <div className="mx-auto flex w-fit items-center gap-1.5">
+      <div className="mx-auto mt-2 flex w-fit items-center gap-1.5">
         <Input
           id="show-sold"
           className="w-fit accent-black"
@@ -99,7 +99,7 @@ export default function Cars({
         <Label htmlFor="show-sold">Показать проданные автомобили</Label>
       </div>
       {/* List of cars */}
-      <ul className="mx-auto mt-2 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:grid-cols-2 md:gap-16 lg:grid-cols-3">
+      <ul className="mx-auto mt-8 grid w-full max-w-5xl grid-flow-row auto-rows-max gap-8 text-sm md:grid-cols-2 md:gap-16 lg:grid-cols-3">
         {isLoading &&
           [1, 2, 3].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">
