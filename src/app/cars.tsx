@@ -39,9 +39,16 @@ export default function Cars({
   updateCar: Function;
 }) {
   let data: Car[] = [];
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data: cars, mutate } = useSWR("/api/cars", fetcher);
+  const fetcher = (url: string) =>
+    fetch(url, {
+      headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
+    }).then((res) => res.json());
+  const { data: cars, mutate } = useSWR(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/cars?select=*&order=created_at.desc`,
+    fetcher,
+  );
   if (cars) data = [...cars];
+  console.log(cars);
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
@@ -78,7 +85,7 @@ export default function Cars({
           Number(b.mileage?.replace(" ", ""))
         );
       default:
-        return 1;
+        return Number(b.created_at) - Number(a.created_at);
     }
   }
 
