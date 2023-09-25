@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, experimental_useOptimistic as useOptimistic } from "react";
 import { motion } from "framer-motion";
 import { AddCarForm, UpdateCarForm } from "./forms";
+import { useRouter } from "next/navigation";
 
 import ExternalLink from "@/components/externalLink";
 import {
@@ -82,8 +83,12 @@ export default function Cars({
     setShowSoldCars(false);
   }
 
+  const router = useRouter();
+
   async function handleAdd(car: Car) {
     await addCar(car);
+    router.refresh();
+    router.refresh();
   }
 
   async function handleDelete(car: Car) {
