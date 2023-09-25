@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, experimental_useOptimistic as useOptimistic } from "react";
 import { motion } from "framer-motion";
-import { AddCarForm, UpdateCarForm } from "./forms";
+import { AddCarForm, UpdateCarForm } from "../forms";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 
@@ -29,11 +29,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Cars({
-  addCar,
   deleteCar,
   updateCar,
 }: {
-  addCar: Function;
   deleteCar: Function;
   updateCar: Function;
 }) {
@@ -100,119 +98,23 @@ export default function Cars({
 
   const router = useRouter();
 
-  async function handleAdd(car: Car) {
-    await mutate(addCar(car), {
-      optimisticData: [...data, { ...car, id: Math.random() }],
+  async function handleDelete(car: Car) {
+    await mutate(deleteCar(car), {
+      optimisticData: [...data].filter((c) => c.id !== car.id),
     });
-    // router.refresh();
+  }
+
+  async function handleUpdate(car: Car, values: Car) {
+    await mutate(updateCar(car, values), {
+      optimisticData: [
+        ...data,
+        { ...data.find((c) => c.id === car.id), values },
+      ],
+    });
   }
 
   return (
     <>
-      {/* Container for actions */}
-      <div className="flex w-full max-w-md flex-col gap-3">
-        {/* Add new car */}
-        <AddCarForm handleAdd={handleAdd} />
-        {/* Search */}
-        <div className="relative mt-3 flex h-fit w-full items-center">
-          <Input
-            type="text"
-            value={searchQuery}
-            placeholder="Поиск по названию"
-            className="w-full pl-9"
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <SearchIcon />
-          {searchQuery && (
-            <button
-              className="absolute right-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-zinc-950 dark:focus-visible:ring-zinc-300"
-              onClick={() => setSearchQuery("")}
-            >
-              <XIcon />
-            </button>
-          )}
-        </div>
-        {/* Filter by seller */}
-        <Select
-          value={filter}
-          defaultValue=""
-          onValueChange={(value) => setFilter(value)}
-        >
-          <SelectTrigger className="relative w-full pl-9">
-            <FilterIcon />
-            <SelectValue
-              placeholder="Выбрать магазин"
-              className="placeholder:text-gray-400"
-            />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">Все продавцы</SelectItem>
-            {sellers.map((seller) => (
-              <SelectItem key={seller} value={seller}>
-                {seller}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {/* Sort cars */}
-        <Select
-          value={sort}
-          defaultValue="created_at"
-          onValueChange={(value) => {
-            switch (value) {
-              case "year":
-                setSort("year");
-                break;
-              case "mileage":
-                setSort("mileage");
-                break;
-              case "price":
-                setSort("price");
-                break;
-              default:
-                setSort("created_at");
-                break;
-            }
-          }}
-        >
-          <SelectTrigger className="relative w-full pl-9">
-            <SortIcon />
-            <SelectValue placeholder="по дате добавления" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem defaultChecked value="created_at">
-              по дате добавления
-            </SelectItem>
-            <SelectItem value="year">по году выпуска</SelectItem>
-            <SelectItem value="mileage">по пробегу</SelectItem>
-            <SelectItem value="price">по цене</SelectItem>
-          </SelectContent>
-        </Select>
-        {/* Toggle sold cars */}
-        <div className="mx-auto mb-3 mt-3 flex w-fit items-center gap-1.5">
-          <Input
-            id="show-sold"
-            className="w-fit accent-black"
-            type="checkbox"
-            checked={showSoldCars}
-            onChange={() => setShowSoldCars(!showSoldCars)}
-          />
-          <Label htmlFor="show-sold">Показать проданные автомобили</Label>
-        </div>
-        {/* Reset filters */}
-        <Button
-          onDoubleClickCapture={(e) => {
-            resetFilters();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              resetFilters();
-            }
-          }}
-        >
-          Сбросить фильтры
-        </Button>
-      </div>
       {/* List of cars */}
       <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3">
         {isLoading &&
@@ -272,11 +174,11 @@ export default function Cars({
               >
                 {car.name}, {car.year}
                 {/* Edit car info */}
-                {/* <UpdateCarForm
+                <UpdateCarForm
                   car={car}
                   handleDelete={handleDelete}
                   handleUpdate={handleUpdate}
-                /> */}
+                />
               </p>
               <p className="w-full border-b pb-1"></p>
               <p className="mt-1.5 flex items-center justify-between text-lg">
