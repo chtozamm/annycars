@@ -28,12 +28,10 @@ import {
 } from "@/components/icons";
 
 export default function Cars({
-  data: serverData,
   addCar,
   deleteCar,
   updateCar,
 }: {
-  data: Car[];
   addCar: Function;
   deleteCar: Function;
   updateCar: Function;
@@ -48,7 +46,6 @@ export default function Cars({
     fetcher,
   );
   if (cars) data = [...cars];
-  console.log(cars);
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars

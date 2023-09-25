@@ -1,13 +1,8 @@
 import { TriangleIcon } from "@/components/icons";
 import prisma from "../../prisma";
 import Cars from "./cars";
-import { revalidatePath } from "next/cache";
-
-export const revalidate = 1;
 
 export default async function Home() {
-  const data = await prisma.cars.findMany();
-
   async function addCar(car: Car) {
     "use server";
     try {
@@ -26,8 +21,6 @@ export default async function Home() {
       });
     } catch (error) {
       console.error("Возникла ошибка при попытке создать запись.");
-    } finally {
-      revalidatePath("/");
     }
   }
 
@@ -53,8 +46,6 @@ export default async function Home() {
       });
     } catch (error) {
       console.error("Возникла ошибка при попытке обновить запись.");
-    } finally {
-      revalidatePath("/");
     }
   }
 
@@ -70,8 +61,6 @@ export default async function Home() {
       console.error(
         "Возникла ошибка при попытке удалить запись, возможно запись уже была удалена.",
       );
-    } finally {
-      revalidatePath("/");
     }
   }
   return (
@@ -80,12 +69,7 @@ export default async function Home() {
         <TriangleIcon />
         annycars
       </header>
-      <Cars
-        data={data}
-        addCar={addCar}
-        deleteCar={deleteCar}
-        updateCar={updateCar}
-      />
+      <Cars addCar={addCar} deleteCar={deleteCar} updateCar={updateCar} />
     </main>
   );
 }
