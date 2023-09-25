@@ -49,20 +49,26 @@ export default function Cars({
   );
   if (cars) data = [...cars];
 
-  // Creates set and converts to array with unique sellers
-  // Used for filtering cars
-  const sellersSet = new Set();
-  data.forEach((car: Car) => sellersSet.add(car.seller));
-  const sellers: string[] = [];
-  sellersSet.forEach((seller) => sellers.push(seller as string));
-  sellers.sort();
-  sellersSet.clear();
-
   // Filters and sort key
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("");
   const [sort, setSort] = useState("created_at");
   const [showSoldCars, setShowSoldCars] = useState(false);
+
+  // Creates set and converts to array with unique sellers
+  // Used for filtering cars
+  const sellersSet = new Set();
+  if (showSoldCars) {
+    data.forEach((car: Car) => sellersSet.add(car.seller));
+  } else {
+    data
+      .filter((car) => !car.isSold)
+      .forEach((car: Car) => sellersSet.add(car.seller));
+  }
+  const sellers: string[] = [];
+  sellersSet.forEach((seller) => sellers.push(seller as string));
+  sellers.sort();
+  sellersSet.clear();
 
   function sortCars(a: Car, b: Car, key: string) {
     switch (key) {
