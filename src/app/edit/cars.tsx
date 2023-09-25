@@ -44,9 +44,6 @@ export default function Cars({
   sellersSet.clear();
 
   // Filters and sort key
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("");
-  const [sort, setSort] = useState("created_at");
   const [showSoldCars, setShowSoldCars] = useState(false);
 
   function sortCars(a: Car, b: Car, key: string) {
@@ -116,15 +113,7 @@ export default function Cars({
             </div>
           ))}
         {data
-          ?.filter((car) => (filter ? car.seller === filter : true))
           ?.filter((car) => (showSoldCars ? true : !car.isSold))
-          ?.filter(
-            (car) =>
-              car.name
-                ?.toLocaleLowerCase()
-                ?.includes(searchQuery?.toLowerCase()),
-          )
-          ?.sort((a, b) => sortCars(a, b, sort))
           ?.map((car: any) => (
             <motion.li
               initial={{ opacity: 0 }}
@@ -139,7 +128,7 @@ export default function Cars({
               key={car.id}
               className="flex w-full flex-col pb-3"
             >
-              <div className="relative aspect-[8/5] w-full select-none overflow-hidden rounded-md bg-gray-100 shadow-md">
+              <div className="relative aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm">
                 {car.image && (
                   <Image
                     src={car.image}
@@ -147,7 +136,7 @@ export default function Cars({
                     sizes="384px"
                     className={`${
                       car.isSold ? "brightness-90 saturate-0" : ""
-                    } bg-gray-200 object-cover transition-all duration-700 ease-in-out
+                    } object-cover transition-all duration-700 ease-in-out
                     `}
                     alt=""
                   />
