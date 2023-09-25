@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { AddCarForm } from "./forms";
 import useSWR from "swr";
@@ -26,6 +26,7 @@ import {
   XIcon,
 } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function Cars({
   addCar,
@@ -49,16 +50,19 @@ export default function Cars({
   );
   if (cars) data = [...cars];
 
+  const router = useRouter();
+  const pathname = usePathname();
   // Filters and sort key
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("");
-  const [sort, setSort] = useState("created_at");
-  const [showSoldCars, setShowSoldCars] = useState(false);
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter") ?? "";
+  const sort = searchParams.get("sort") ?? "";
+  const searchQuery = searchParams.get("q") ?? "";
+  const sold_cars = searchParams.get("sold_cars") ?? "";
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
-  if (showSoldCars) {
+  if (sold_cars === "true") {
     data.forEach((car: Car) => sellersSet.add(car.seller));
   } else {
     data
@@ -94,11 +98,18 @@ export default function Cars({
     }
   }
 
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams],
+  );
+
   function resetFilters() {
-    setSearchQuery("");
-    setFilter("");
-    setSort("created_at");
-    setShowSoldCars(false);
+    router.push("/");
   }
 
   async function handleAdd(car: Car) {
@@ -106,7 +117,6 @@ export default function Cars({
       optimisticData: [...data, { ...car, id: Math.random() }],
     });
   }
-
   return (
     <>
       {/* Container for actions */}
@@ -120,13 +130,22 @@ export default function Cars({
             value={searchQuery}
             placeholder="Поиск по названию"
             className="w-full pl-9"
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              router.replace(
+                pathname + "?" + createQueryString("q", e.target.value),
+                { scroll: false },
+              );
+            }}
           />
           <SearchIcon />
           {searchQuery && (
             <button
               className="absolute right-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-zinc-950 dark:focus-visible:ring-zinc-300"
-              onClick={() => setSearchQuery("")}
+              onClick={() =>
+                router.replace(pathname + "?" + createQueryString("q", ""), {
+                  scroll: false,
+                })
+              }
             >
               <XIcon />
             </button>
@@ -136,7 +155,11 @@ export default function Cars({
         <Select
           value={filter}
           defaultValue=""
-          onValueChange={(value) => setFilter(value)}
+          onValueChange={(value) =>
+            router.push(pathname + "?" + createQueryString("filter", value), {
+              scroll: false,
+            })
+          }
         >
           <SelectTrigger className="relative w-full pl-9">
             <FilterIcon />
@@ -156,23 +179,10 @@ export default function Cars({
         </Select>
         {/* Sort cars */}
         <Select
-          value={sort}
-          defaultValue="created_at"
           onValueChange={(value) => {
-            switch (value) {
-              case "year":
-                setSort("year");
-                break;
-              case "mileage":
-                setSort("mileage");
-                break;
-              case "price":
-                setSort("price");
-                break;
-              default:
-                setSort("created_at");
-                break;
-            }
+            router.push(pathname + "?" + createQueryString("sort", value), {
+              scroll: false,
+            });
           }}
         >
           <SelectTrigger className="relative w-full pl-9">
@@ -194,8 +204,20 @@ export default function Cars({
             id="show-sold"
             className="w-fit accent-black"
             type="checkbox"
-            checked={showSoldCars}
-            onChange={() => setShowSoldCars(!showSoldCars)}
+            checked={sold_cars === "true"}
+            onChange={() =>
+              router.push(
+                pathname +
+                  "?" +
+                  createQueryString(
+                    "sold_cars",
+                    sold_cars === "true" ? "false" : "true",
+                  ),
+                {
+                  scroll: false,
+                },
+              )
+            }
           />
           <Label htmlFor="show-sold">Показать проданные автомобили</Label>
         </div>
@@ -229,7 +251,7 @@ export default function Cars({
           ))}
         {data
           ?.filter((car) => (filter ? car.seller === filter : true))
-          ?.filter((car) => (showSoldCars ? true : !car.isSold))
+          ?.filter((car) => (sold_cars === "true" ? true : !car.isSold))
           ?.filter(
             (car) =>
               car.name
