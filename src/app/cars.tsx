@@ -247,11 +247,11 @@ export default function Cars({
               >
                 {car.name}, {car.year}
                 {/* Edit car info */}
-                <UpdateCarForm
+                {/* <UpdateCarForm
                   car={car}
                   handleDelete={handleDelete}
                   handleUpdate={handleUpdate}
-                />
+                /> */}
               </p>
               <p className="w-full border-b pb-1"></p>
               <p className="mt-1.5 flex items-center justify-between text-lg">
