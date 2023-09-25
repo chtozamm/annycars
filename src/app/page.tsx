@@ -1,6 +1,7 @@
 import { TriangleIcon } from "@/components/icons";
 import prisma from "../../prisma";
 import Cars from "./cars";
+import Link from "next/link";
 
 export default async function Home() {
   async function addCar(car: Car) {
@@ -65,6 +66,18 @@ export default async function Home() {
   }
   return (
     <main className="flex flex-col items-center justify-start px-6 pb-8">
+      <div className="flex h-8 w-screen items-center justify-center bg-black text-center text-sm font-light text-white">
+        <span>
+          Редактировать объявления можно{" "}
+          <Link
+            href="/edit"
+            className="font-medium underline underline-offset-4"
+          >
+            здесь
+          </Link>
+          .
+        </span>
+      </div>
       <header className="flex h-20 cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold">
         <TriangleIcon />
         annycars
