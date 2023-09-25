@@ -24,7 +24,6 @@ import {
   SortIcon,
   XIcon,
 } from "@/components/icons";
-import { useRouter } from "next/navigation";
 
 export default function Cars({
   data,
@@ -83,18 +82,16 @@ export default function Cars({
     setShowSoldCars(false);
   }
 
-  const router = useRouter();
-
   async function handleAdd(car: Car) {
-    await addCar(car).then(() => router.refresh());
+    await addCar(car);
   }
 
   async function handleDelete(car: Car) {
-    await deleteCar(car).then(() => router.refresh());
+    await deleteCar(car);
   }
 
   async function handleUpdate(car: Car, values: Car) {
-    await updateCar(car, values).then(() => router.refresh());
+    await updateCar(car, values);
   }
 
   return (
