@@ -40,8 +40,30 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { formSchema } from "@/lib/zod";
 import { EditIcon, PlusSquareIcon } from "@/components/icons";
+
+export const formSchema = z.object({
+  name: z.string().nonempty({ message: "Введите название" }),
+  year: z.string().length(4, { message: "Выберите год" }),
+  // link: z.string().startsWith("https://", { message: "Must provide secure URL" }).url({ message: "Некорректный адрес" }),
+  link: z.union([
+    z
+      .string()
+      .startsWith("https://auto.ru")
+      .url({ message: "Некорректный адрес" }),
+    z
+      .string()
+      .startsWith("https://avito.ru")
+      .url({ message: "Некорректный адрес" }),
+  ]),
+  image: z.string(),
+  price: z.string(),
+  mileage: z.string(),
+  seller: z.string().nonempty({ message: "Укажите продавца" }),
+  advantages: z.string(),
+  disadvantages: z.string(),
+  isSold: z.boolean(),
+});
 
 export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -237,7 +259,11 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
             />
             <div className="flex justify-end">
               <DialogClose
-                disabled={!form.getValues().name || !form.getValues().year}
+                disabled={
+                  !form.getValues().name ||
+                  !form.getValues().year ||
+                  !form.getValues().seller
+                }
                 type="submit"
                 className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
               >
@@ -495,7 +521,11 @@ export function UpdateCarForm({
                 </AlertDialogContent>
               </AlertDialog>
               <DialogClose
-                disabled={!form.getValues().name || !form.getValues().year}
+                disabled={
+                  !form.getValues().name ||
+                  !form.getValues().year ||
+                  !form.getValues().seller
+                }
                 type="submit"
                 className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
               >
