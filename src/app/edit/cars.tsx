@@ -128,7 +128,13 @@ export default function Cars({
               key={car.id}
               className="flex w-full flex-col pb-3"
             >
-              <div className="relative aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm">
+              <div
+                className={`${
+                  car.image
+                    ? ""
+                    : "bg-gradient bg-gradient-to-b from-gray-50 to-gray-100"
+                } relative aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm`}
+              >
                 {car.image && (
                   <Image
                     src={car.image}
