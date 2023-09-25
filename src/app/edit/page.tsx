@@ -48,7 +48,7 @@ export default async function EditPage() {
     }
   }
   return (
-    <main>
+    <main className="flex flex-col items-center justify-start px-6 pb-8">
       <HeaderMessage label="Вернуться на " keyword="главную" link="/" />
       <div className="mt-8 flex flex-col items-center justify-center gap-6 text-sm">
         {/* <Menu /> */}
