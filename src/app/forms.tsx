@@ -44,7 +44,6 @@ import { formSchema } from "@/lib/zod";
 import { EditIcon, PlusSquareIcon } from "@/components/icons";
 
 export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,17 +60,6 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // const uuid = Math.random().toString();
-    // addOptimisticCars(values);
-    // await fetch("https://annycars.vercel.app/api/cars", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //   },
-    //   body: JSON.stringify(values),
-    // });
     await handleAdd(values);
   }
 
@@ -121,7 +109,6 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                     Год выпуска
                   </FormLabel>
                   <FormControl>
-                    {/* <Input autoComplete="off" {...field} /> */}
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -273,7 +260,6 @@ export function UpdateCarForm({
   handleDelete: Function;
   handleUpdate: Function;
 }) {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -290,8 +276,6 @@ export function UpdateCarForm({
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     await handleUpdate(car.id, values);
   }
 
@@ -503,7 +487,6 @@ export function UpdateCarForm({
                     <AlertDialogCancel>Отмена</AlertDialogCancel>
                     <DialogClose
                       onClick={() => handleDelete(car)}
-                      // className="mt-2 sm:mt-0"
                       className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
                     >
                       Удалить

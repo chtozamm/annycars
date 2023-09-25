@@ -1,31 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useState, experimental_useOptimistic as useOptimistic } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { AddCarForm, UpdateCarForm } from "../forms";
-import { useRouter } from "next/navigation";
+import { UpdateCarForm } from "../forms";
 import useSWR from "swr";
 
 import ExternalLink from "@/components/externalLink";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  FilterIcon,
-  PlusIcon,
-  MinusIcon,
-  SearchIcon,
-  SortIcon,
-  XIcon,
-} from "@/components/icons";
+import { PlusIcon, MinusIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Cars({
@@ -89,15 +73,6 @@ export default function Cars({
     }
   }
 
-  function resetFilters() {
-    setSearchQuery("");
-    setFilter("");
-    setSort("created_at");
-    setShowSoldCars(false);
-  }
-
-  const router = useRouter();
-
   async function handleDelete(car: Car) {
     await mutate(deleteCar(car), {
       optimisticData: [...data].filter((c) => c.id !== car.id),
@@ -129,7 +104,7 @@ export default function Cars({
       {/* List of cars */}
       <ul className="mx-auto mt-2 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:grid-cols-2 md:gap-16 lg:grid-cols-3">
         {isLoading &&
-          [1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+          [1, 2, 3].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">
               <Skeleton className="aspect-[8/5] w-full rounded-md" />
               <Skeleton className="mt-3 h-7 w-full" />

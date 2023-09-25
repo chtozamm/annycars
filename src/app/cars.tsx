@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useState, experimental_useOptimistic as useOptimistic } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { AddCarForm, UpdateCarForm } from "./forms";
-import { useRouter } from "next/navigation";
+import { AddCarForm } from "./forms";
 import useSWR from "swr";
 
 import ExternalLink from "@/components/externalLink";
@@ -30,8 +29,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Cars({
   addCar,
-  deleteCar,
-  updateCar,
 }: {
   addCar: Function;
   deleteCar: Function;
@@ -98,13 +95,10 @@ export default function Cars({
     setShowSoldCars(false);
   }
 
-  const router = useRouter();
-
   async function handleAdd(car: Car) {
     await mutate(addCar(car), {
       optimisticData: [...data, { ...car, id: Math.random() }],
     });
-    // router.refresh();
   }
 
   return (
@@ -216,7 +210,7 @@ export default function Cars({
       {/* List of cars */}
       <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:mt-16 md:grid-cols-2 md:gap-16 lg:grid-cols-3">
         {isLoading &&
-          [1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+          [1, 2, 3].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">
               <Skeleton className="aspect-[8/5] w-full rounded-md" />
               <Skeleton className="mt-3 h-7 w-full" />
@@ -271,12 +265,6 @@ export default function Cars({
                 } mt-3 flex items-center justify-between text-xl font-semibold`}
               >
                 {car.name}, {car.year}
-                {/* Edit car info */}
-                {/* <UpdateCarForm
-                  car={car}
-                  handleDelete={handleDelete}
-                  handleUpdate={handleUpdate}
-                /> */}
               </p>
               <p className="w-full border-b pb-1"></p>
               <p className="mt-1.5 flex items-center justify-between text-lg">

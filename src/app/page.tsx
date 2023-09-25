@@ -1,7 +1,6 @@
 import { TriangleIcon } from "@/components/icons";
 import prisma from "../../prisma";
 import Cars from "./cars";
-import Link from "next/link";
 import { HeaderMessage } from "@/components/HeaderMessage";
 
 export default async function Home() {

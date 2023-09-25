@@ -14,7 +14,6 @@ export default function AuthForm() {
   const [error, setError] = useState(false);
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Validate inputs
     setDisabled(true);
     const res = await signIn("credentials", {
       password: userInfo.password,
