@@ -18,8 +18,8 @@ export default async function EditPage() {
         data: {
           name: car.name,
           year: car.year,
-          image: car.image || "",
-          link: car.link || "",
+          image: car.image?.startsWith("https://") ? car.image : "",
+          link: car.link?.startsWith("https://") ? car.link : "",
           price: car.price || "",
           mileage: car.mileage || "",
           seller: car.seller,
@@ -53,7 +53,7 @@ export default async function EditPage() {
   return (
     <main className="mx-3 flex flex-col items-center justify-start px-6 pb-8">
       <HeaderMessage label="Вернуться на " keyword="главную" link="/" />
-      <header className="flex h-20 cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold">
+      <header className="relative flex h-20 cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold after:absolute after:left-[103%] after:top-[40%] after:bg-black after:p-0.5 after:text-xs after:font-normal after:text-white after:content-['admin']">
         <TriangleIcon />
         annycars
       </header>

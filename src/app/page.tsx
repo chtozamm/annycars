@@ -12,8 +12,8 @@ export default async function Home() {
         data: {
           name: car.name,
           year: car.year,
-          image: car.image || "",
-          link: car.link || "",
+          image: car.image?.startsWith("https://") ? car.image : "",
+          link: car.link?.startsWith("https://") ? car.link : "",
           price:
             Number(car.price?.replaceAll(" ", ""))
               .toLocaleString()
@@ -39,8 +39,8 @@ export default async function Home() {
         data: {
           name: car.name,
           year: car.year,
-          image: car.image || "",
-          link: car.link || "",
+          image: car.image?.startsWith("https://") ? car.image : "",
+          link: car.link?.startsWith("https://") ? car.link : "",
           price:
             Number(car.price?.replaceAll(" ", ""))
               .toLocaleString()

@@ -182,7 +182,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
           Добавить автомобиль
         </Button>
       </DialogTrigger>
-      <DialogContent className="mx-auto flex h-screen max-h-screen w-full min-w-fit max-w-md flex-col justify-start overflow-y-auto rounded-lg bg-white shadow-xl sm:h-fit sm:max-h-[95vh]">
+      <DialogContent className="mx-auto flex h-screen max-h-screen w-full min-w-fit max-w-md flex-col justify-start overflow-y-auto rounded-none bg-white shadow-xl sm:h-fit sm:max-h-[95vh] sm:rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-center">Добавить автомобиль</DialogTitle>
         </DialogHeader>
@@ -369,7 +369,11 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                 >
                   {form.getValues().image && (
                     <Image
-                      src={form.getValues().image}
+                      src={
+                        form.getValues().image.startsWith("https://")
+                          ? form.getValues().image
+                          : ""
+                      }
                       fill
                       sizes="384px"
                       className={`${
@@ -462,6 +466,11 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   )}
                 </div>
                 <DialogClose
+                  disabled={
+                    !form.getValues().name ||
+                    !form.getValues().year ||
+                    !form.getValues().seller
+                  }
                   type="submit"
                   className="mt-8 inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
                 >
@@ -546,7 +555,7 @@ export function UpdateCarForm({
           <EditIcon />
         </Button>
       </DialogTrigger>
-      <DialogContent className="mx-auto flex h-screen max-h-screen w-full min-w-fit max-w-md flex-col justify-start overflow-y-auto rounded-lg bg-white shadow-xl sm:h-fit sm:max-h-[95vh]">
+      <DialogContent className="mx-auto flex h-screen max-h-screen w-full min-w-fit max-w-md flex-col justify-start overflow-y-auto rounded-none bg-white shadow-xl sm:h-fit sm:max-h-[95vh] sm:rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-center">Изменить данные</DialogTitle>
         </DialogHeader>
@@ -757,7 +766,11 @@ export function UpdateCarForm({
                 >
                   {form.getValues().image && (
                     <Image
-                      src={form.getValues().image}
+                      src={
+                        form.getValues().image.startsWith("https://")
+                          ? form.getValues().image
+                          : ""
+                      }
                       fill
                       sizes="384px"
                       className={`${
@@ -855,6 +868,11 @@ export function UpdateCarForm({
                   }`}
                 >
                   <DialogClose
+                    disabled={
+                      !form.getValues().name ||
+                      !form.getValues().year ||
+                      !form.getValues().seller
+                    }
                     type="submit"
                     className="mt-8 flex h-10 w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
                   >
