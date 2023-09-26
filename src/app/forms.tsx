@@ -3,13 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 // UI
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,7 +47,7 @@ import Image from "next/image";
 
 export const formSchema = z.object({
   name: z.string().nonempty({ message: "Введите название" }),
-  year: z.string().length(4, { message: "Выберите год" }),
+  year: z.string().length(4).nonempty({ message: "Укажите год выпуска" }),
   link: z.union([z.literal(""), z.string().trim().url()]),
   image: z.union([z.literal(""), z.string().trim().url()]),
   price: z.string(),
@@ -103,7 +96,7 @@ function StepUpdate({
         transition={{ duration: 0.2 }}
         className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 font-semibold"
       >
-        <div className="flex items-center justify-center">
+        <div className="flex select-none items-center justify-center">
           {status === "complete" ? (
             <span className="text-white">{step}</span>
           ) : (
@@ -146,7 +139,7 @@ function Step({ step, currentStep }: { step: number; currentStep: number }) {
         transition={{ duration: 0.2 }}
         className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 font-semibold"
       >
-        <div className="flex items-center justify-center">
+        <div className="flex select-none items-center justify-center">
           {status === "complete" ? (
             <CheckIcon className="h-6 w-6 text-white" />
           ) : (
@@ -181,13 +174,6 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
     await handleAdd(values);
   }
 
-  const arrayRange = (start: number, stop: number, step: number) =>
-    Array.from(
-      { length: (stop - start) / step + 1 },
-      (value, index) => start + index * step,
-    );
-
-  const years = arrayRange(2010, 2016, 1);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -241,23 +227,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                         Год выпуска
                       </FormLabel>
                       <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a verified email to display" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="max-h-[10rem] overflow-y-auto">
-                            {years.map((year: number) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Input autoComplete="off" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -417,7 +387,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   {form.getValues().name}, {form.getValues().year}
                 </p>
                 <p className="w-full border-b pb-1"></p>
-                <p className="mt-1.5 flex items-center justify-between text-lg">
+                <p className="mt-1.5 flex max-w-[334px] items-center justify-between text-lg">
                   {form.getValues().price &&
                     (isNaN(+form.getValues().price.replace(" ", ""))
                       ? form.getValues().price
@@ -428,44 +398,49 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                     </span>
                   )}
                 </p>
-                <div className="mt-3 grid grid-cols-1 gap-6 text-sm">
-                  {form.getValues().advantages && (
-                    <div>
-                      <span className="text-base font-medium">
-                        Преимущества
-                      </span>
-                      <p className="flex flex-col">
-                        {form.getValues().advantages &&
-                          form
-                            .getValues()
-                            .advantages.split(",")
-                            .map((item: string) => (
-                              <span key={item} className="flex gap-1.5">
-                                <PlusIcon />
-                                {item.trim()}
-                              </span>
-                            ))}
-                      </p>
-                    </div>
-                  )}
-                  {form.getValues().disadvantages && (
-                    <div>
-                      <span className="text-base font-medium">Недостатки</span>
-                      <p className="flex flex-col">
-                        {form.getValues().disadvantages &&
-                          form
-                            .getValues()
-                            .disadvantages.split(",")
-                            .map((item: string) => (
-                              <span key={item} className="flex gap-1.5">
-                                <MinusIcon />
-                                {item.trim()}
-                              </span>
-                            ))}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                {(form.getValues().advantages ||
+                  form.getValues().disadvantages) && (
+                  <div className="mt-3 grid grid-cols-1 gap-6 text-sm">
+                    {form.getValues().advantages && (
+                      <div>
+                        <span className="text-base font-medium">
+                          Преимущества
+                        </span>
+                        <p className="flex flex-col">
+                          {form.getValues().advantages &&
+                            form
+                              .getValues()
+                              .advantages.split(",")
+                              .map((item: string) => (
+                                <span key={item} className="flex gap-1.5">
+                                  <PlusIcon />
+                                  {item.trim()}
+                                </span>
+                              ))}
+                        </p>
+                      </div>
+                    )}
+                    {form.getValues().disadvantages && (
+                      <div>
+                        <span className="text-base font-medium">
+                          Недостатки
+                        </span>
+                        <p className="flex flex-col">
+                          {form.getValues().disadvantages &&
+                            form
+                              .getValues()
+                              .disadvantages.split(",")
+                              .map((item: string) => (
+                                <span key={item} className="flex gap-1.5">
+                                  <MinusIcon />
+                                  {item.trim()}
+                                </span>
+                              ))}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="flex justify-between pt-6">
                   {form.getValues().seller && (
                     <span className="flex items-center gap-1 text-sm font-medium text-gray-400">
@@ -550,16 +525,9 @@ export function UpdateCarForm({
     await handleUpdate(car.id, values);
   }
 
-  const arrayRange = (start: number, stop: number, step: number) =>
-    Array.from(
-      { length: (stop - start) / step + 1 },
-      (value, index) => start + index * step,
-    );
-
   // Multistep Wizard
   let [step, setStep] = useState(5);
 
-  const years = arrayRange(2010, 2016, 1);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -615,23 +583,7 @@ export function UpdateCarForm({
                         Год выпуска
                       </FormLabel>
                       <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a verified email to display" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="max-h-[10rem] overflow-y-auto">
-                            {years.map((year: number) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Input autoComplete="off" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -816,7 +768,7 @@ export function UpdateCarForm({
                   {form.getValues().name}, {form.getValues().year}
                 </p>
                 <p className="w-full border-b pb-1"></p>
-                <p className="mt-1.5 flex items-center justify-between text-lg">
+                <p className="mt-1.5 flex max-w-[334px] items-center justify-between text-lg">
                   {form.getValues().price &&
                     (isNaN(+form.getValues().price.replace(" ", ""))
                       ? form.getValues().price
@@ -827,44 +779,49 @@ export function UpdateCarForm({
                     </span>
                   )}
                 </p>
-                <div className="mt-3 grid grid-cols-1 gap-6 text-sm">
-                  {form.getValues().advantages && (
-                    <div>
-                      <span className="text-base font-medium">
-                        Преимущества
-                      </span>
-                      <p className="flex flex-col">
-                        {form.getValues().advantages &&
-                          form
-                            .getValues()
-                            .advantages.split(",")
-                            .map((item: string) => (
-                              <span key={item} className="flex gap-1.5">
-                                <PlusIcon />
-                                {item.trim()}
-                              </span>
-                            ))}
-                      </p>
-                    </div>
-                  )}
-                  {form.getValues().disadvantages && (
-                    <div>
-                      <span className="text-base font-medium">Недостатки</span>
-                      <p className="flex flex-col">
-                        {form.getValues().disadvantages &&
-                          form
-                            .getValues()
-                            .disadvantages.split(",")
-                            .map((item: string) => (
-                              <span key={item} className="flex gap-1.5">
-                                <MinusIcon />
-                                {item.trim()}
-                              </span>
-                            ))}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                {(form.getValues().advantages ||
+                  form.getValues().disadvantages) && (
+                  <div className="mt-3 grid grid-cols-1 gap-6 text-sm">
+                    {form.getValues().advantages && (
+                      <div>
+                        <span className="text-base font-medium">
+                          Преимущества
+                        </span>
+                        <p className="flex flex-col">
+                          {form.getValues().advantages &&
+                            form
+                              .getValues()
+                              .advantages.split(",")
+                              .map((item: string) => (
+                                <span key={item} className="flex gap-1.5">
+                                  <PlusIcon />
+                                  {item.trim()}
+                                </span>
+                              ))}
+                        </p>
+                      </div>
+                    )}
+                    {form.getValues().disadvantages && (
+                      <div>
+                        <span className="text-base font-medium">
+                          Недостатки
+                        </span>
+                        <p className="flex flex-col">
+                          {form.getValues().disadvantages &&
+                            form
+                              .getValues()
+                              .disadvantages.split(",")
+                              .map((item: string) => (
+                                <span key={item} className="flex gap-1.5">
+                                  <MinusIcon />
+                                  {item.trim()}
+                                </span>
+                              ))}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="flex justify-between pt-6">
                   {form.getValues().seller && (
                     <span className="flex items-center gap-1 text-sm font-medium text-gray-400">

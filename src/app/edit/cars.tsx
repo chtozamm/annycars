@@ -92,7 +92,7 @@ export default function Cars({
   return (
     <>
       {/* Toggle sold cars */}
-      <div className="mx-auto mt-2 flex w-fit items-center gap-1.5">
+      <div className="mx-auto mt-2 flex w-fit select-none items-center gap-1.5">
         <Input
           id="show-sold"
           className="w-fit accent-black"
@@ -103,7 +103,7 @@ export default function Cars({
         <Label htmlFor="show-sold">Показать проданные автомобили</Label>
       </div>
       {/* List of cars */}
-      <ul className="mx-auto mt-8 grid w-full max-w-5xl grid-flow-row auto-rows-max gap-8 text-sm md:grid-cols-2 md:gap-16 lg:grid-cols-3">
+      <ul className="xs:grid-cols-2 mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:grid-cols-3 md:gap-16 xl:grid-cols-4">
         {isLoading &&
           [1, 2, 3].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">
@@ -177,38 +177,42 @@ export default function Cars({
                   </span>
                 )}
               </p>
-              <div className="mt-3 grid grid-cols-1 gap-6">
-                {/* Advantages */}
-                {car.advantages && (
-                  <div>
-                    <span className="text-base font-medium">Преимущества</span>
-                    <p className="flex flex-col">
-                      {car.advantages &&
-                        car.advantages.split(",").map((item: string) => (
-                          <span key={item} className="flex gap-1.5">
-                            <PlusIcon />
-                            {item.trim()}
-                          </span>
-                        ))}
-                    </p>
-                  </div>
-                )}
-                {/* Disadvantages */}
-                {car.disadvantages && (
-                  <div>
-                    <span className="text-base font-medium">Недостатки</span>
-                    <p className="flex flex-col">
-                      {car.disadvantages &&
-                        car.disadvantages.split(",").map((item: string) => (
-                          <span key={item} className="flex gap-1.5">
-                            <MinusIcon />
-                            {item.trim()}
-                          </span>
-                        ))}
-                    </p>
-                  </div>
-                )}
-              </div>
+              {(car.advantages || car.disadvantages) && (
+                <div className="mt-3 grid grid-cols-1 gap-6">
+                  {/* Advantages */}
+                  {car.advantages && (
+                    <div>
+                      <span className="text-base font-medium">
+                        Преимущества
+                      </span>
+                      <p className="flex flex-col">
+                        {car.advantages &&
+                          car.advantages.split(",").map((item: string) => (
+                            <span key={item} className="flex gap-1.5">
+                              <PlusIcon />
+                              {item.trim()}
+                            </span>
+                          ))}
+                      </p>
+                    </div>
+                  )}
+                  {/* Disadvantages */}
+                  {car.disadvantages && (
+                    <div>
+                      <span className="text-base font-medium">Недостатки</span>
+                      <p className="flex flex-col">
+                        {car.disadvantages &&
+                          car.disadvantages.split(",").map((item: string) => (
+                            <span key={item} className="flex gap-1.5">
+                              <MinusIcon />
+                              {item.trim()}
+                            </span>
+                          ))}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
               <div className="flex justify-between pt-6">
                 {car.seller && (
                   <span className="flex items-center gap-1 text-sm font-medium text-gray-400">
