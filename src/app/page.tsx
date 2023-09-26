@@ -14,8 +14,14 @@ export default async function Home() {
           year: car.year,
           image: car.image || "",
           link: car.link || "",
-          price: car.price || "",
-          mileage: car.mileage || "",
+          price:
+            Number(car.price?.replaceAll(" ", ""))
+              .toLocaleString()
+              .replace(/,/g, " ") || "",
+          mileage:
+            Number(car.mileage?.replaceAll(" ", ""))
+              .toLocaleString()
+              .replace(/,/g, " ") || "",
           seller: car.seller,
           advantages: car.advantages || "",
           disadvantages: car.disadvantages || "",
@@ -35,8 +41,14 @@ export default async function Home() {
           year: car.year,
           image: car.image || "",
           link: car.link || "",
-          price: car.price || "",
-          mileage: car.mileage || "",
+          price:
+            Number(car.price?.replaceAll(" ", ""))
+              .toLocaleString()
+              .replace(/,/g, " ") || "",
+          mileage:
+            Number(car.mileage?.replaceAll(" ", ""))
+              .toLocaleString()
+              .replace(/,/g, " ") || "",
           seller: car.seller,
           advantages: car.advantages || "",
           disadvantages: car.disadvantages || "",

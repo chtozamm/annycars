@@ -105,15 +105,17 @@ export default function Cars({
       {/* List of cars */}
       <ul className="xs:grid-cols-2 mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:grid-cols-3 md:gap-16 xl:grid-cols-4">
         {isLoading &&
-          [1, 2, 3].map((item) => (
+          [1, 2, 3, 4].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">
               <Skeleton className="aspect-[8/5] w-full rounded-md" />
-              <Skeleton className="mt-3 h-7 w-full" />
-              <p className="w-full border-b pb-1"></p>
-              <span className="mt-1.5 flex items-center justify-between text-lg">
-                <Skeleton className="h-6 w-24" />
+              <Skeleton className="mt-3 h-5 w-2/3" />
+              <span className="mt-3 flex items-center justify-between text-lg">
+                <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-4 w-20" />
               </span>
+              <Skeleton className="mt-3 h-4 w-1/2" />
+              <Skeleton className="mt-2 h-3 w-2/3" />
+              <Skeleton className="mt-2 h-3 w-2/3" />
             </div>
           ))}
         {data
@@ -136,10 +138,10 @@ export default function Cars({
                 className={`${
                   car.image
                     ? ""
-                    : "bg-gradient bg-gradient-to-b from-gray-50 to-gray-100"
+                    : "bg-gradient bg-gradient-to-b from-gray-100 to-gray-200"
                 } relative aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm`}
               >
-                {car.image && (
+                {car.image ? (
                   <Image
                     src={car.image}
                     fill
@@ -148,6 +150,17 @@ export default function Cars({
                       car.isSold ? "brightness-90 saturate-0" : ""
                     } object-cover transition-all duration-700 ease-in-out
                     `}
+                    alt=""
+                  />
+                ) : (
+                  <Image
+                    src={"/car-placeholder.png"}
+                    fill
+                    sizes="384px"
+                    className={`${
+                      car.isSold ? "brightness-90 saturate-0" : ""
+                    } object-cover transition-all duration-700 ease-in-out 
+                  `}
                     alt=""
                   />
                 )}

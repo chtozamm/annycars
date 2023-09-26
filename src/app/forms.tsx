@@ -296,11 +296,12 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Цена</FormLabel>
+                      <FormLabel className="after:ml-1 after:content-['(₽)']">
+                        Цена
+                      </FormLabel>
                       <FormControl>
                         <Input autoComplete="off" {...field} />
                       </FormControl>
-                      <FormDescription>В формате 123 456</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -310,11 +311,13 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   name="mileage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Пробег</FormLabel>
+                      <FormLabel className="after:ml-1 after:content-['(км)']">
+                        Пробег
+                      </FormLabel>
                       <FormControl>
                         <Input autoComplete="off" {...field} />
                       </FormControl>
-                      <FormDescription>В формате 123 456</FormDescription>
+                      {/* <span className="absolute right-3 top-3">км</span> */}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -391,10 +394,15 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   {form.getValues().price &&
                     (isNaN(+form.getValues().price.replace(" ", ""))
                       ? form.getValues().price
-                      : form.getValues().price + " ₽")}
+                      : Number(form.getValues().price.replaceAll(" ", ""))
+                          .toLocaleString()
+                          .replace(/,/g, " ") + " ₽")}
                   {form.getValues().mileage && (
                     <span className="ml-auto text-sm text-gray-600">
-                      {form.getValues().mileage} км
+                      {Number(form.getValues().mileage.replaceAll(" ", ""))
+                        .toLocaleString()
+                        .replace(/,/g, " ")}{" "}
+                      км
                     </span>
                   )}
                 </p>
@@ -655,11 +663,12 @@ export function UpdateCarForm({
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Цена</FormLabel>
+                      <FormLabel className="after:ml-1 after:content-['(₽)']">
+                        Цена
+                      </FormLabel>
                       <FormControl>
                         <Input autoComplete="off" {...field} />
                       </FormControl>
-                      <FormDescription>В формате 123 456</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -669,11 +678,12 @@ export function UpdateCarForm({
                   name="mileage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Пробег</FormLabel>
+                      <FormLabel className="after:ml-1 after:content-['(км)']">
+                        Пробег
+                      </FormLabel>
                       <FormControl>
                         <Input autoComplete="off" {...field} />
                       </FormControl>
-                      <FormDescription>В формате 123 456</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -772,10 +782,15 @@ export function UpdateCarForm({
                   {form.getValues().price &&
                     (isNaN(+form.getValues().price.replace(" ", ""))
                       ? form.getValues().price
-                      : form.getValues().price + " ₽")}
+                      : Number(form.getValues().price.replaceAll(" ", ""))
+                          .toLocaleString()
+                          .replace(/,/g, " ") + " ₽")}
                   {form.getValues().mileage && (
                     <span className="ml-auto text-sm text-gray-600">
-                      {form.getValues().mileage} км
+                      {Number(form.getValues().mileage.replaceAll(" ", ""))
+                        .toLocaleString()
+                        .replace(/,/g, " ")}{" "}
+                      км
                     </span>
                   )}
                 </p>
