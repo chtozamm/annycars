@@ -55,8 +55,8 @@ import Image from "next/image";
 export const formSchema = z.object({
   name: z.string().nonempty({ message: "Введите название" }),
   year: z.string().length(4, { message: "Выберите год" }),
-  link: z.string(),
-  image: z.string(),
+  link: z.union([z.literal(""), z.string().trim().url()]),
+  image: z.union([z.literal(""), z.string().trim().url()]),
   price: z.string(),
   mileage: z.string(),
   seller: z.string().nonempty({ message: "Укажите продавца" }),
@@ -78,7 +78,7 @@ function StepUpdate({
   return (
     <motion.div
       animate={status}
-      className="h-fit w-fit"
+      className="h-fit w-fit active:rounded-full"
       onClick={() => setCurrentStep(step)}
     >
       <motion.div
@@ -205,6 +205,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
           <Step step={2} currentStep={step} />
           <Step step={3} currentStep={step} />
           <Step step={4} currentStep={step} />
+          <Step step={5} currentStep={step} />
         </div>
         <div className="px-8">
           <Form {...form}>
@@ -427,8 +428,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                     </span>
                   )}
                 </p>
-                <div className="mt-3 grid grid-cols-1 gap-6">
-                  {/* Advantages */}
+                <div className="mt-3 grid grid-cols-1 gap-6 text-sm">
                   {form.getValues().advantages && (
                     <div>
                       <span className="text-base font-medium">
@@ -448,7 +448,6 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                       </p>
                     </div>
                   )}
-                  {/* Disadvantages */}
                   {form.getValues().disadvantages && (
                     <div>
                       <span className="text-base font-medium">Недостатки</span>
@@ -580,6 +579,7 @@ export function UpdateCarForm({
           <StepUpdate step={2} currentStep={step} setCurrentStep={setStep} />
           <StepUpdate step={3} currentStep={step} setCurrentStep={setStep} />
           <StepUpdate step={4} currentStep={step} setCurrentStep={setStep} />
+          <StepUpdate step={5} currentStep={step} setCurrentStep={setStep} />
         </div>
         <div className="px-8">
           <Form {...form}>
@@ -687,6 +687,9 @@ export function UpdateCarForm({
                           {...field}
                         />
                       </FormControl>
+                      {form.formState.errors?.image?.message && (
+                        <p>{form.formState.errors.image.message}</p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -824,8 +827,7 @@ export function UpdateCarForm({
                     </span>
                   )}
                 </p>
-                <div className="mt-3 grid grid-cols-1 gap-6">
-                  {/* Advantages */}
+                <div className="mt-3 grid grid-cols-1 gap-6 text-sm">
                   {form.getValues().advantages && (
                     <div>
                       <span className="text-base font-medium">
@@ -845,7 +847,6 @@ export function UpdateCarForm({
                       </p>
                     </div>
                   )}
-                  {/* Disadvantages */}
                   {form.getValues().disadvantages && (
                     <div>
                       <span className="text-base font-medium">Недостатки</span>
@@ -876,87 +877,75 @@ export function UpdateCarForm({
                     </span>
                   )}
                 </div>
-
-                {/* <DialogClose
-                  type="submit"
-                  className="mt-8 inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
+                <div
+                  className={`${
+                    step === 5 ? "flex flex-col items-center gap-3" : "hidden"
+                  }`}
                 >
-                  Добавить
-                </DialogClose> */}
+                  <DialogClose
+                    type="submit"
+                    className="mt-8 flex h-10 w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
+                  >
+                    Сохранить
+                  </DialogClose>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button className="w-full" variant="outline">
+                        Удалить
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Вы уверены, что хотите удалить объявление?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {car.name}, {car.year}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Отмена</AlertDialogCancel>
+                        <Button
+                          onClick={() => handleDelete(car)}
+                          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300 sm:w-fit"
+                        >
+                          Удалить
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
             </form>
           </Form>
         </div>
-        <div className="px-8">
-          <div
-            className={`${
-              step === 5 ? "hidden" : "mt-10 flex justify-between"
-            }`}
-          >
-            <Button
-              variant={"outline"}
-              onClick={() => setStep(step < 2 ? step : step - 1)}
-              className={`${
-                step === 1 ? "pointer-events-none opacity-50" : ""
-              } ${step === 5 ? "w-full" : ""}
+        <div
+          className={`${
+            step === 5 ? "hidden" : "mx-8 mt-10 flex justify-between"
+          }`}
+        >
+          <Button
+            variant={"outline"}
+            onClick={() => setStep(step < 2 ? step : step - 1)}
+            className={`${step === 1 ? "pointer-events-none opacity-50" : ""} ${
+              step === 5 ? "w-full" : ""
+            }
               `}
-            >
-              Назад
-            </Button>
-            <Button
-              disabled={
-                step === 1
-                  ? !form.getValues().name || !form.getValues().year
-                  : !form.getValues().seller
-              }
-              onClick={() => setStep(step > 4 ? step : step + 1)}
-              className={`${step > 4 ? "hidden" : ""}`}
-            >
-              Продолжить
-            </Button>
-          </div>
-          <div
-            className={`${
-              step === 5 ? "flex flex-col items-center gap-3" : "hidden"
-            }`}
           >
-            <Button
-              type="submit"
-              className="mt-8 flex h-10 w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
-            >
-              Сохранить
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="w-full" variant="outline">
-                  Удалить
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Вы уверены, что хотите удалить объявление?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {car.name}, {car.year}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Отмена</AlertDialogCancel>
-                  <Button
-                    onClick={() => handleDelete(car)}
-                    className="inline-flex h-10 w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
-                  >
-                    Удалить
-                  </Button>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+            Назад
+          </Button>
+          <Button
+            disabled={
+              step === 1
+                ? !form.getValues().name || !form.getValues().year
+                : !form.getValues().seller
+            }
+            onClick={() => setStep(step > 4 ? step : step + 1)}
+            className={`${step > 4 ? "hidden" : ""}`}
+          >
+            Продолжить
+          </Button>
         </div>
-        {/* 
-          </form>
-        </Form> */}
       </DialogContent>
     </Dialog>
   );

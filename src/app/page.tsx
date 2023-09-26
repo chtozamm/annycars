@@ -4,6 +4,7 @@ import Cars from "./cars";
 import { HeaderMessage } from "@/components/HeaderMessage";
 
 export default async function Home() {
+  const serverCars = await prisma.cars.findMany();
   async function addCar(car: Car) {
     "use server";
     try {
@@ -75,7 +76,12 @@ export default async function Home() {
         <TriangleIcon />
         annycars
       </header>
-      <Cars addCar={addCar} deleteCar={deleteCar} updateCar={updateCar} />
+      <Cars
+        addCar={addCar}
+        deleteCar={deleteCar}
+        updateCar={updateCar}
+        serverCars={serverCars}
+      />
     </main>
   );
 }

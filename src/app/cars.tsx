@@ -29,8 +29,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function Cars({
+  serverCars,
   addCar,
 }: {
+  serverCars: Car[];
   addCar: Function;
   deleteCar: Function;
   updateCar: Function;
@@ -43,12 +45,14 @@ export default function Cars({
   const {
     data: cars,
     isLoading,
+    error,
     mutate,
   } = useSWR(
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/cars?select=*&order=created_at.desc`,
     fetcher,
   );
   if (cars) data = [...cars];
+  if (error || (cars && cars.length === 0)) data = serverCars;
 
   const router = useRouter();
   const pathname = usePathname();

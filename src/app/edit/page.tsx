@@ -7,6 +7,8 @@ import prisma from "../../../prisma";
 import { TriangleIcon } from "@/components/icons";
 
 export default async function EditPage() {
+  const serverCars = await prisma.cars.findMany();
+
   const session = await getServerSession();
 
   async function updateCar(id: string, car: Car) {
@@ -67,7 +69,14 @@ export default async function EditPage() {
           <AuthForm />
         </div>
       )}
-      {session && <Cars deleteCar={deleteCar} updateCar={updateCar} />}
+
+      {session && (
+        <Cars
+          deleteCar={deleteCar}
+          updateCar={updateCar}
+          serverCars={serverCars}
+        />
+      )}
     </main>
   );
 }

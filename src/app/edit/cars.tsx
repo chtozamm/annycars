@@ -13,9 +13,11 @@ import { PlusIcon, MinusIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Cars({
+  serverCars,
   deleteCar,
   updateCar,
 }: {
+  serverCars: Car[];
   deleteCar: Function;
   updateCar: Function;
 }) {
@@ -27,12 +29,14 @@ export default function Cars({
   const {
     data: cars,
     isLoading,
+    error,
     mutate,
   } = useSWR(
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/cars?select=*&order=created_at.desc`,
     fetcher,
   );
   if (cars) data = [...cars];
+  if (error || (cars && cars.length === 0)) data = serverCars;
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
