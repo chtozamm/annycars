@@ -58,7 +58,7 @@ export const formSchema = z.object({
   isSold: z.boolean(),
 });
 
-function Step({
+function StepUpdate({
   step,
   currentStep,
   setCurrentStep,
@@ -108,6 +108,49 @@ function Step({
   );
 }
 
+function Step({ step, currentStep }: { step: number; currentStep: number }) {
+  let status =
+    currentStep === step
+      ? "active"
+      : currentStep < step
+      ? "inactive"
+      : "complete";
+  return (
+    <motion.div animate={status} className="h-fit w-fit active:rounded-full">
+      <motion.div
+        initial={false}
+        variants={{
+          inactive: {
+            backgroundColor: "#fff",
+            borderColor: "#e5e5e5",
+            color: "#a3a3a3",
+          },
+          active: {
+            backgroundColor: "#fff",
+            borderColor: "#000",
+            color: "#000",
+          },
+          complete: {
+            backgroundColor: "#000",
+            borderColor: "#000",
+            color: "#000",
+          },
+        }}
+        transition={{ duration: 0.2 }}
+        className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 font-semibold"
+      >
+        <div className="flex select-none items-center justify-center">
+          {status === "complete" ? (
+            <CheckIcon className="h-6 w-6 text-white" />
+          ) : (
+            <span>{step}</span>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
   // Multistep Wizard
   let [step, setStep] = useState(1);
@@ -144,11 +187,11 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
           <DialogTitle className="text-center">Добавить автомобиль</DialogTitle>
         </DialogHeader>
         <div className="flex h-fit justify-between rounded p-8">
-          <Step step={1} currentStep={step} setCurrentStep={setStep} />
-          <Step step={2} currentStep={step} setCurrentStep={setStep} />
-          <Step step={3} currentStep={step} setCurrentStep={setStep} />
-          <Step step={4} currentStep={step} setCurrentStep={setStep} />
-          <Step step={5} currentStep={step} setCurrentStep={setStep} />
+          <Step step={1} currentStep={step} />
+          <Step step={2} currentStep={step} />
+          <Step step={3} currentStep={step} />
+          <Step step={4} currentStep={step} />
+          <Step step={5} currentStep={step} />
         </div>
         <div className="px-8">
           <Form {...form}>
@@ -525,11 +568,11 @@ export function UpdateCarForm({
           <DialogTitle className="text-center">Изменить данные</DialogTitle>
         </DialogHeader>
         <div className="flex h-fit justify-between rounded px-8 py-3 sm:py-8">
-          <Step step={1} currentStep={step} setCurrentStep={setStep} />
-          <Step step={2} currentStep={step} setCurrentStep={setStep} />
-          <Step step={3} currentStep={step} setCurrentStep={setStep} />
-          <Step step={4} currentStep={step} setCurrentStep={setStep} />
-          <Step step={5} currentStep={step} setCurrentStep={setStep} />
+          <StepUpdate step={1} currentStep={step} setCurrentStep={setStep} />
+          <StepUpdate step={2} currentStep={step} setCurrentStep={setStep} />
+          <StepUpdate step={3} currentStep={step} setCurrentStep={setStep} />
+          <StepUpdate step={4} currentStep={step} setCurrentStep={setStep} />
+          <StepUpdate step={5} currentStep={step} setCurrentStep={setStep} />
         </div>
         <div className="px-8">
           <Form {...form}>
