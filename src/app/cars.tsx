@@ -72,7 +72,7 @@ export default function Cars({
   // Used for filtering cars
   const sellersSet = new Set();
   if (sold === "true") {
-    if (!session.data) {
+    if (!showPersonal) {
       data
         .filter((car) => !car.personal)
         .forEach((car: Car) => sellersSet.add(car.seller));
@@ -80,7 +80,7 @@ export default function Cars({
       data.forEach((car: Car) => sellersSet.add(car.seller));
     }
   } else {
-    if (!session.data) {
+    if (!showPersonal) {
       data
         .filter((car) => !car.personal)
         .filter((car) => !car.isSold)
