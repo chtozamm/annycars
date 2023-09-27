@@ -411,9 +411,13 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                           .replace(/,/g, " ") + " ₽")}
                   {form.getValues().mileage && (
                     <span className="ml-auto text-sm text-gray-600">
-                      {Number(form.getValues().mileage.replaceAll(" ", ""))
-                        .toLocaleString()
-                        .replace(/,/g, " ")}{" "}
+                      {isNaN(
+                        Number(form.getValues().mileage.replaceAll(" ", "")),
+                      )
+                        ? form.getValues().mileage
+                        : Number(form.getValues().mileage.replaceAll(" ", ""))
+                            .toLocaleString()
+                            .replace(/,/g, " ")}{" "}
                       км
                     </span>
                   )}
@@ -819,9 +823,13 @@ export function UpdateCarForm({
                           .replace(/,/g, " ") + " ₽")}
                   {form.getValues().mileage && (
                     <span className="ml-auto text-sm text-gray-600">
-                      {Number(form.getValues().mileage.replaceAll(" ", ""))
-                        .toLocaleString()
-                        .replace(/,/g, " ")}{" "}
+                      {isNaN(
+                        Number(form.getValues().mileage.replaceAll(" ", "")),
+                      )
+                        ? form.getValues().mileage
+                        : Number(form.getValues().mileage.replaceAll(" ", ""))
+                            .toLocaleString()
+                            .replace(/,/g, " ")}{" "}
                       км
                     </span>
                   )}
