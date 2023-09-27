@@ -72,11 +72,24 @@ export default function Cars({
   // Used for filtering cars
   const sellersSet = new Set();
   if (sold === "true") {
-    data.forEach((car: Car) => sellersSet.add(car.seller));
+    if (!session.data) {
+      data
+        .filter((car) => !car.personal)
+        .forEach((car: Car) => sellersSet.add(car.seller));
+    } else {
+      data.forEach((car: Car) => sellersSet.add(car.seller));
+    }
   } else {
-    data
-      .filter((car) => !car.isSold)
-      .forEach((car: Car) => sellersSet.add(car.seller));
+    if (!session.data) {
+      data
+        .filter((car) => !car.personal)
+        .filter((car) => !car.isSold)
+        .forEach((car: Car) => sellersSet.add(car.seller));
+    } else {
+      data
+        .filter((car) => !car.isSold)
+        .forEach((car: Car) => sellersSet.add(car.seller));
+    }
   }
   const sellers: string[] = [];
   sellersSet.forEach((seller) => sellers.push(seller as string));
@@ -134,7 +147,7 @@ export default function Cars({
         {/* Fun mode */}
         {session.data && (
           <div className="mx-auto mb-3 mt-3 flex w-fit select-none items-center gap-1.5">
-            <Label htmlFor="show-sold">Fun mode</Label>
+            <Label htmlFor="show-personal">Fun mode</Label>
             <Switch
               id="show-personal"
               className="accent-black"
