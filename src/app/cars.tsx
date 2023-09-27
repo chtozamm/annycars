@@ -36,8 +36,6 @@ export default function Cars({
 }: {
   serverCars: Car[];
   addCar: Function;
-  deleteCar: Function;
-  updateCar: Function;
 }) {
   const session = useSession();
 

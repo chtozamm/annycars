@@ -51,30 +51,6 @@ export default function Cars({
   const [searchQuery, setSearchQuery] = useState("");
   const [showSoldCars, setShowSoldCars] = useState(false);
 
-  function sortCars(a: Car, b: Car, key: string) {
-    switch (key) {
-      case "created_at":
-        return Number(b.created_at) - Number(a.created_at);
-      case "year":
-        return Number(b.year) - Number(a.year);
-      case "price":
-        if (!a.price) return 1;
-        if (!b.price) return -1;
-        return (
-          Number(a.price?.replace(" ", "")) - Number(b.price?.replace(" ", ""))
-        );
-      case "mileage":
-        if (!a.mileage) return 1;
-        if (!b.mileage) return -1;
-        return (
-          Number(a.mileage?.replace(" ", "")) -
-          Number(b.mileage?.replace(" ", ""))
-        );
-      default:
-        return Number(b.created_at) - Number(a.created_at);
-    }
-  }
-
   async function handleDelete(car: Car) {
     await mutate(deleteCar(car), {
       optimisticData: [...data].filter((c) => c.id !== car.id),
@@ -128,7 +104,7 @@ export default function Cars({
         </div>
       </div>
       {/* List of cars */}
-      <ul className="xs:grid-cols-2 mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm md:grid-cols-3 md:gap-16 xl:grid-cols-4">
+      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm xs:grid-cols-2 md:grid-cols-3 md:gap-16 xl:grid-cols-4">
         {isLoading &&
           [1, 2, 3, 4].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">

@@ -26,6 +26,7 @@ export default async function EditPage() {
           advantages: car.advantages || "",
           disadvantages: car.disadvantages || "",
           isSold: car.isSold,
+          personal: car.personal,
         },
         where: {
           id: id,

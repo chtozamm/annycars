@@ -78,6 +78,7 @@ export const formSchema = z.object({
   advantages: z.string(),
   disadvantages: z.string(),
   isSold: z.boolean(),
+  personal: z.boolean(),
 });
 
 function StepUpdate({
@@ -614,6 +615,7 @@ export function UpdateCarForm({
       advantages: car.advantages || "",
       disadvantages: car.disadvantages || "",
       isSold: car.isSold,
+      personal: car.personal,
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -820,6 +822,28 @@ export function UpdateCarForm({
                             onChange={field.onChange}
                           />
                           <Label htmlFor="is-sold">Автомобиль продан</Label>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="personal"
+                  render={({ field }) => (
+                    <FormItem className="mt-6 flex flex-row items-center gap-3">
+                      <FormControl>
+                        <div className="flex gap-1.5">
+                          <Input
+                            autoComplete="off"
+                            id="is-personal"
+                            className="w-fit accent-black"
+                            type="checkbox"
+                            defaultChecked={form.getValues().personal}
+                            onChange={field.onChange}
+                          />
+                          <Label htmlFor="is-personal">Fun mode only</Label>
                         </div>
                       </FormControl>
                       <FormMessage />
