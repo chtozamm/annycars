@@ -27,6 +27,7 @@ import {
 } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function Cars({
   serverCars,
@@ -37,6 +38,9 @@ export default function Cars({
   deleteCar: Function;
   updateCar: Function;
 }) {
+  const session = useSession();
+  console.log(session);
+
   let data: Car[] = [];
   const fetcher = (url: string) =>
     fetch(url, {
@@ -256,6 +260,8 @@ export default function Cars({
                 ?.includes(searchQuery?.toLowerCase()),
           )
           ?.sort((a, b) => sortCars(a, b, sort))
+          ?.filter((car) => (!session.data ? car.seller !== "@chtozamm" : true))
+          ?.filter((car) => (!session.data ? car.seller !== "🦊🐺" : true))
           ?.map((car: any) => (
             <motion.li
               initial={{ opacity: 0 }}
