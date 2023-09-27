@@ -66,7 +66,7 @@ export default function Cars({
   const sort = searchParams.get("sort") ?? "";
   const [searchQuery, setSearchQuery] = useState("");
   const sold = searchParams.get("sold") ?? "";
-  const [showPersonal, setShowPersonal] = useState(session.data ? true : false);
+  const [showPersonal, setShowPersonal] = useState(false);
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
