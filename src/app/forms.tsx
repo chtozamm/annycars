@@ -47,12 +47,21 @@ import Image from "next/image";
 
 export const formSchema = z.object({
   name: z.string().nonempty({ message: "Введите название" }),
-  year: z.string().length(4).nonempty({ message: "Укажите год выпуска" }),
-  link: z.union([z.literal(""), z.string().trim().url()]),
-  image: z.union([z.literal(""), z.string().trim().url()]),
+  year: z
+    .string()
+    .length(4, { message: "Должен содержать 4 знака" })
+    .nonempty({ message: "Укажите год выпуска" }),
+  seller: z.string().nonempty({ message: "Укажите продавца" }),
+  link: z.union([
+    z.literal(""),
+    z.string().trim().url({ message: "Должна начинаться с https://" }),
+  ]),
+  image: z.union([
+    z.literal(""),
+    z.string().trim().url({ message: "Должна начинаться с https://" }),
+  ]),
   price: z.string(),
   mileage: z.string(),
-  seller: z.string().nonempty({ message: "Укажите продавца" }),
   advantages: z.string(),
   disadvantages: z.string(),
   isSold: z.boolean(),
@@ -278,11 +287,13 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                       <FormLabel>Фото</FormLabel>
                       <FormControl>
                         <Input
+                          disabled
                           autoComplete="off"
                           placeholder="https://..."
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription>Временно недоступно</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -317,7 +328,6 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                       <FormControl>
                         <Input autoComplete="off" {...field} />
                       </FormControl>
-                      {/* <span className="absolute right-3 top-3">км</span> */}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -355,6 +365,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   )}
                 />
               </div>
+              {/* Preview */}
               <div
                 className={`${
                   step === 5 ? "flex flex-col justify-end gap-3" : "hidden"
@@ -481,7 +492,8 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   disabled={
                     !form.getValues().name ||
                     !form.getValues().year ||
-                    !form.getValues().seller
+                    !form.getValues().seller ||
+                    Boolean(Object.keys(form.formState.errors).length)
                   }
                   type="submit"
                   className="mt-8 inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
@@ -502,7 +514,6 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
               } ${step === 5 ? "w-full" : ""}
               `}
             >
-              {/* duration-350 rounded px-2 py-1 text-neutral-400 transition hover:text-neutral-700 */}
               Назад
             </Button>
             <Button
@@ -511,16 +522,57 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   ? !form.getValues().name || !form.getValues().year
                   : !form.getValues().seller
               }
-              onClick={() => setStep(step > 4 ? step : step + 1)}
+              onClick={async () => {
+                switch (step) {
+                  case 1:
+                    await form.trigger(["name", "year"]);
+                    if (
+                      Boolean(form.getFieldState("name").error) === false &&
+                      Boolean(form.getFieldState("year").error) === false
+                    ) {
+                      setStep(step > 4 ? step : step + 1);
+                    }
+                    break;
+                  case 2:
+                    await form.trigger(["seller", "link", "image"]);
+                    if (
+                      Boolean(form.getFieldState("seller").error) === false &&
+                      Boolean(form.getFieldState("link").error) === false &&
+                      Boolean(form.getFieldState("image").error) === false
+                    ) {
+                      setStep(step > 4 ? step : step + 1);
+                    }
+                    break;
+                  case 3:
+                    await form.trigger(["price", "mileage"]);
+                    if (
+                      Boolean(form.getFieldState("price").error) === false &&
+                      Boolean(form.getFieldState("mileage").error) === false
+                    ) {
+                      setStep(step > 4 ? step : step + 1);
+                    }
+                    break;
+                  case 4:
+                    await form.trigger(["advantages", "disadvantages"]);
+                    if (
+                      Boolean(form.getFieldState("advantages").error) ===
+                        false &&
+                      Boolean(form.getFieldState("disadvantages").error) ===
+                        false
+                    ) {
+                      setStep(step > 4 ? step : step + 1);
+                    }
+                    break;
+                  default:
+                    break;
+                }
+              }}
               className={`${step > 4 ? "hidden" : ""}`}
             >
               Продолжить
             </Button>
           </div>
         </div>
-        {/* 
-          </form>
-        </Form> */}
       </DialogContent>
     </Dialog>
   );
@@ -537,6 +589,7 @@ export function UpdateCarForm({
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "all",
     defaultValues: {
       name: car.name,
       year: car.year,
@@ -668,9 +721,6 @@ export function UpdateCarForm({
                           {...field}
                         />
                       </FormControl>
-                      {form.formState.errors?.image?.message && (
-                        <p>{form.formState.errors.image.message}</p>
-                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -764,6 +814,7 @@ export function UpdateCarForm({
                   )}
                 />
               </div>
+              {/* Preview */}
               <div
                 className={`${
                   step === 5 ? "flex flex-col justify-end gap-3" : "hidden"
@@ -898,7 +949,8 @@ export function UpdateCarForm({
                     disabled={
                       !form.getValues().name ||
                       !form.getValues().year ||
-                      !form.getValues().seller
+                      !form.getValues().seller ||
+                      Boolean(Object.keys(form.formState.errors).length)
                     }
                     type="submit"
                     className="mt-8 flex h-10 w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 ring-offset-white transition-colors hover:bg-zinc-900/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:ring-offset-zinc-950 dark:hover:bg-zinc-50/90 dark:focus-visible:ring-zinc-300"
@@ -957,7 +1009,49 @@ export function UpdateCarForm({
                 ? !form.getValues().name || !form.getValues().year
                 : !form.getValues().seller
             }
-            onClick={() => setStep(step > 4 ? step : step + 1)}
+            onClick={async () => {
+              switch (step) {
+                case 1:
+                  await form.trigger(["name", "year"]);
+                  if (
+                    Boolean(form.getFieldState("name").error) === false &&
+                    Boolean(form.getFieldState("year").error) === false
+                  ) {
+                    setStep(step > 4 ? step : step + 1);
+                  }
+                  break;
+                case 2:
+                  await form.trigger(["seller", "link", "image"]);
+                  if (
+                    Boolean(form.getFieldState("seller").error) === false &&
+                    Boolean(form.getFieldState("link").error) === false &&
+                    Boolean(form.getFieldState("image").error) === false
+                  ) {
+                    setStep(step > 4 ? step : step + 1);
+                  }
+                  break;
+                case 3:
+                  await form.trigger(["price", "mileage"]);
+                  if (
+                    Boolean(form.getFieldState("price").error) === false &&
+                    Boolean(form.getFieldState("mileage").error) === false
+                  ) {
+                    setStep(step > 4 ? step : step + 1);
+                  }
+                  break;
+                case 4:
+                  await form.trigger(["advantages", "disadvantages"]);
+                  if (
+                    Boolean(form.getFieldState("advantages").error) === false &&
+                    Boolean(form.getFieldState("disadvantages").error) === false
+                  ) {
+                    setStep(step > 4 ? step : step + 1);
+                  }
+                  break;
+                default:
+                  break;
+              }
+            }}
             className={`${step > 4 ? "hidden" : ""}`}
           >
             Продолжить
