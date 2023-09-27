@@ -11,4 +11,5 @@ type Car = {
   price?: string | null;
   mileage?: string | null;
   isSold?: boolean;
+  personal?: boolean;
 };

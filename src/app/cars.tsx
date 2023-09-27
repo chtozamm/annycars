@@ -28,6 +28,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Switch } from "@/components/ui/switch";
 
 export default function Cars({
   serverCars,
@@ -39,7 +40,6 @@ export default function Cars({
   updateCar: Function;
 }) {
   const session = useSession();
-  console.log(session);
 
   let data: Car[] = [];
   const fetcher = (url: string) =>
@@ -66,6 +66,7 @@ export default function Cars({
   const sort = searchParams.get("sort") ?? "";
   const [searchQuery, setSearchQuery] = useState("");
   const sold = searchParams.get("sold") ?? "";
+  const [showPersonal, setShowPersonal] = useState(session.data ? true : false);
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
@@ -130,6 +131,18 @@ export default function Cars({
     <>
       {/* Container for actions */}
       <div className="flex w-full max-w-md flex-col gap-3">
+        {/* Fun mode */}
+        {session.data && (
+          <div className="mx-auto mb-3 mt-3 flex w-fit select-none items-center gap-1.5">
+            <Label htmlFor="show-sold">Fun mode</Label>
+            <Switch
+              id="show-personal"
+              className="accent-black"
+              checked={showPersonal}
+              onCheckedChange={() => setShowPersonal(!showPersonal)}
+            />
+          </div>
+        )}
         {/* Add new car */}
         <AddCarForm handleAdd={handleAdd} />
         {/* Search */}
@@ -260,8 +273,7 @@ export default function Cars({
                 ?.includes(searchQuery?.toLowerCase()),
           )
           ?.sort((a, b) => sortCars(a, b, sort))
-          ?.filter((car) => (!session.data ? car.seller !== "@chtozamm" : true))
-          ?.filter((car) => (!session.data ? car.seller !== "🦊🐺" : true))
+          ?.filter((car) => (!showPersonal ? !car.personal : true))
           ?.map((car: any) => (
             <motion.li
               initial={{ opacity: 0 }}
