@@ -54,7 +54,20 @@ export const formSchema = z.object({
   seller: z.string().nonempty({ message: "Укажите продавца" }),
   link: z.union([
     z.literal(""),
-    z.string().trim().url({ message: "Должна начинаться с https://" }),
+    z
+      .string()
+      .trim()
+      .url({ message: "Должна начинаться с https://" })
+      .startsWith("https://auto.ru/", {
+        message: "Объявление должно быть с auto.ru или avito.ru",
+      }),
+    z
+      .string()
+      .trim()
+      .url({ message: "Неверный формат ссылки" })
+      .startsWith("https://avito.ru/", {
+        message: "Объявление должно быть с auto.ru или avito.ru",
+      }),
   ]),
   image: z.union([
     z.literal(""),
