@@ -25,6 +25,8 @@ export default async function Home() {
           seller: car.seller,
           advantages: car.advantages || "",
           disadvantages: car.disadvantages || "",
+          isSold: false,
+          personal: false,
         },
       });
     } catch (error) {

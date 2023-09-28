@@ -191,6 +191,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
       advantages: "",
       disadvantages: "",
       isSold: false,
+      personal: false,
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -301,13 +302,13 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                       <FormLabel>Фото</FormLabel>
                       <FormControl>
                         <Input
-                          disabled
+                          // disabled
                           autoComplete="off"
                           placeholder="https://..."
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>Временно недоступно</FormDescription>
+                      {/* <FormDescription>Временно недоступно</FormDescription> */}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -537,6 +538,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                   : !form.getValues().seller
               }
               onClick={async () => {
+                console.log(form.formState.errors);
                 switch (step) {
                   case 1:
                     await form.trigger(["name", "year"]);
