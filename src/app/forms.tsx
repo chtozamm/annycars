@@ -196,6 +196,8 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await handleAdd(values);
+    form.reset();
+    setStep(1);
   }
 
   return (
