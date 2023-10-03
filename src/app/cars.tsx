@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { AddCarForm } from "./forms";
+import { AddCarForm, UpdateCarForm } from "./forms";
 import useSWR from "swr";
 
 import ExternalLink from "@/components/externalLink";
@@ -33,9 +33,13 @@ import { Switch } from "@/components/ui/switch";
 export default function Cars({
   serverCars,
   addCar,
+  deleteCar,
+  updateCar,
 }: {
   serverCars: Car[];
   addCar: Function;
+  deleteCar: Function;
+  updateCar: Function;
 }) {
   const session = useSession();
 
@@ -64,30 +68,30 @@ export default function Cars({
   const sort = searchParams.get("sort") ?? "";
   const [searchQuery, setSearchQuery] = useState("");
   const sold = searchParams.get("sold") ?? "";
-  const [showPersonal, setShowPersonal] = useState(false);
+  // const [showPersonal, setShowPersonal] = useState(false);
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
   if (sold === "true") {
-    if (!showPersonal) {
-      data
-        .filter((car) => !car.personal)
-        .forEach((car: Car) => sellersSet.add(car.seller));
-    } else {
-      data.forEach((car: Car) => sellersSet.add(car.seller));
-    }
+    // if (!showPersonal) {
+    //   data
+    //     .filter((car) => !car.personal)
+    //     .forEach((car: Car) => sellersSet.add(car.seller));
+    // } else {
+    data.forEach((car: Car) => sellersSet.add(car.seller));
+    // }
   } else {
-    if (!showPersonal) {
-      data
-        .filter((car) => !car.personal)
-        .filter((car) => !car.isSold)
-        .forEach((car: Car) => sellersSet.add(car.seller));
-    } else {
-      data
-        .filter((car) => !car.isSold)
-        .forEach((car: Car) => sellersSet.add(car.seller));
-    }
+    // if (!showPersonal) {
+    //   data
+    //     .filter((car) => !car.personal)
+    //     .filter((car) => !car.isSold)
+    //     .forEach((car: Car) => sellersSet.add(car.seller));
+    // } else {
+    data
+      .filter((car) => !car.isSold)
+      .forEach((car: Car) => sellersSet.add(car.seller));
+    // }
   }
   const sellers: string[] = [];
   sellersSet.forEach((seller) => sellers.push(seller as string));
@@ -138,13 +142,28 @@ export default function Cars({
       optimisticData: [...data, { ...car, id: Math.random() }],
     });
   }
+
+  async function handleDelete(car: Car) {
+    await mutate(deleteCar(car), {
+      optimisticData: [...data].filter((c) => c.id !== car.id),
+    });
+  }
+
+  async function handleUpdate(car: Car, values: Car) {
+    await mutate(updateCar(car, values), {
+      optimisticData: [
+        ...data,
+        { ...data.find((c) => c.id === car.id), values },
+      ],
+    });
+  }
   return (
     <>
       {/* Container for actions */}
       <div className="flex w-full max-w-md flex-col gap-3">
         {/* Fun mode */}
-        {session.data && (
-          <div className="mx-auto mb-3 mt-3 flex w-fit select-none items-center gap-1.5">
+        {/* {session.data && (
+          <div className="mx-auto mb-3 flex w-fit select-none items-center gap-1.5">
             <Label htmlFor="show-personal">Fun mode</Label>
             <Switch
               id="show-personal"
@@ -153,11 +172,15 @@ export default function Cars({
               onCheckedChange={() => setShowPersonal(!showPersonal)}
             />
           </div>
-        )}
+        )} */}
         {/* Add new car */}
-        <AddCarForm handleAdd={handleAdd} />
+        {session.data && <AddCarForm handleAdd={handleAdd} />}
         {/* Search */}
-        <div className="relative mt-3 flex h-fit w-full items-center">
+        <div
+          className={`${
+            session.data && "mt-3"
+          } relative flex h-fit w-full items-center`}
+        >
           <Input
             type="text"
             value={searchQuery}
@@ -259,7 +282,7 @@ export default function Cars({
         </Button>
       </div>
       {/* List of cars */}
-      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm xs:grid-cols-2 md:mt-16 md:grid-cols-3 md:gap-16 xl:grid-cols-4">
+      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm xs:grid-cols-2 md:mt-14  md:grid-cols-3 md:gap-16 xl:grid-cols-4">
         {isLoading &&
           [1, 2, 3, 4].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">
@@ -277,6 +300,7 @@ export default function Cars({
         {data
           ?.filter((car) => (filter !== "all" ? car.seller === filter : true))
           ?.filter((car) => (sold === "true" ? true : !car.isSold))
+          ?.filter((car) => (sort ? !car.personal : true))
           ?.filter(
             (car) =>
               car.name
@@ -284,7 +308,7 @@ export default function Cars({
                 ?.includes(searchQuery?.toLowerCase()),
           )
           ?.sort((a, b) => sortCars(a, b, sort))
-          ?.filter((car) => (!showPersonal ? !car.personal : true))
+          // ?.filter((car) => (!showPersonal ? !car.personal : true))
           ?.map((car: any) => (
             <motion.li
               initial={{ opacity: 0 }}
@@ -317,6 +341,14 @@ export default function Cars({
                     `}
                     alt=""
                   />
+                ) : car.name === "Fox" ? (
+                  <Image
+                    src={"/fox.png"}
+                    fill
+                    sizes="360px"
+                    className="bg-white object-contain transition-all duration-700 ease-in-out"
+                    alt=""
+                  />
                 ) : (
                   <Image
                     src={"/car-placeholder.png"}
@@ -336,6 +368,14 @@ export default function Cars({
                 } mt-3 flex items-center justify-between text-xl font-semibold`}
               >
                 {car.name}, {car.year}
+                {/* Edit car info */}
+                {session.data && (
+                  <UpdateCarForm
+                    car={car}
+                    handleDelete={handleDelete}
+                    handleUpdate={handleUpdate}
+                  />
+                )}
               </p>
               <p className="w-full border-b pb-1"></p>
               <p className="mt-1.5 flex items-center justify-between text-lg">

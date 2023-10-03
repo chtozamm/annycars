@@ -44,6 +44,7 @@ import { CheckIcon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
 import ExternalLink from "@/components/externalLink";
 import Image from "next/image";
+import { Textarea } from "@/components/ui/textarea";
 
 export const formSchema = z.object({
   name: z.string().nonempty({ message: "Введите название" }),
@@ -360,7 +361,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                     <FormItem>
                       <FormLabel>Преимущества</FormLabel>
                       <FormControl>
-                        <Input autoComplete="off" {...field} />
+                        <Textarea autoComplete="off" {...field} />
                       </FormControl>
                       <FormDescription>Через запятую</FormDescription>
                       <FormMessage />
@@ -374,7 +375,7 @@ export function AddCarForm({ handleAdd }: { handleAdd: Function }) {
                     <FormItem>
                       <FormLabel>Недостатки</FormLabel>
                       <FormControl>
-                        <Input autoComplete="off" {...field} />
+                        <Textarea autoComplete="off" {...field} />
                       </FormControl>
                       <FormDescription>Через запятую</FormDescription>
                       <FormMessage />
@@ -633,7 +634,7 @@ export function UpdateCarForm({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="w-fit items-center gap-1.5 text-gray-300"
+          className="h-6 w-8 items-center gap-1.5 p-0 text-gray-300 hover:bg-white"
           variant="ghost"
         >
           <EditIcon />
@@ -789,7 +790,7 @@ export function UpdateCarForm({
                     <FormItem>
                       <FormLabel>Преимущества</FormLabel>
                       <FormControl>
-                        <Input autoComplete="off" {...field} />
+                        <Textarea autoComplete="off" {...field} />
                       </FormControl>
                       <FormDescription>Через запятую</FormDescription>
                       <FormMessage />
@@ -803,7 +804,7 @@ export function UpdateCarForm({
                     <FormItem>
                       <FormLabel>Недостатки</FormLabel>
                       <FormControl>
-                        <Input autoComplete="off" {...field} />
+                        <Textarea autoComplete="off" {...field} />
                       </FormControl>
                       <FormDescription>Через запятую</FormDescription>
                       <FormMessage />

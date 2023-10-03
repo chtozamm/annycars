@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 
@@ -29,7 +29,10 @@ export default function AuthForm() {
       setError(false);
       router.refresh();
     }
+
+    // if (res?.ok) router.replace("/");
   }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -52,7 +55,7 @@ export default function AuthForm() {
         className="w-full"
         disabled={!userInfo.password}
       >
-        Пройти
+        Войти
       </Button>
       {error && !userInfo.password && <p>Неверный пароль</p>}
     </form>
