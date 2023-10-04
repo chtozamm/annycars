@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AddCarForm, UpdateCarForm } from "./forms";
 import useSWR from "swr";
@@ -166,6 +166,14 @@ export default function Cars({
       ],
     });
   }
+
+  useEffect(() => {
+    if (searchParams.get("filter") === "🦊🐺") {
+      router.replace("/?filter=🦊🐺", {
+        scroll: false,
+      });
+    }
+  }, [filter, router, searchParams]);
   return (
     <>
       {/* Container for actions */}
@@ -289,31 +297,37 @@ export default function Cars({
         >
           Сбросить фильтры
         </Button>
-        <p className="mt-3 text-center">
-          {amountOfShownCars}{" "}
-          {amountOfShownCars === 0
+        <p className="mt-3 text-center text-sm">
+          {isLoading
+            ? "Загружаем автомобили... 🦔"
+            : amountOfShownCars === 0
             ? "Нет автомобилей, удовлетворяющих выбранные фильтры"
             : amountOfShownCars === 1
-            ? "автомобиль"
+            ? "Показан 1 автомобиль"
             : amountOfShownCars === 2 || amountOfShownCars === 3
-            ? "автомобиля"
-            : "автомобилей"}
+            ? `Показано ${amountOfShownCars} автомобиля`
+            : `Показано ${amountOfShownCars} автомобилей`}
         </p>
       </div>
       {/* List of cars */}
-      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm xs:grid-cols-2 md:mt-14 md:grid-cols-3 md:gap-16  xl:flex xl:flex-col">
+      <ul className="mx-auto mt-8 grid w-full max-w-md grid-flow-row auto-rows-max gap-8 text-sm sm:flex sm:max-w-3xl sm:flex-col">
         {isLoading &&
           [1, 2, 3, 4].map((item) => (
-            <div key={item} className="flex w-full flex-col pb-3">
-              <Skeleton className="aspect-[8/5] w-full rounded-md" />
-              <Skeleton className="mt-3 h-5 w-2/3" />
-              <span className="mt-3 flex items-center justify-between text-lg">
-                <Skeleton className="h-5 w-24" />
-                <Skeleton className="h-4 w-20" />
-              </span>
-              <Skeleton className="mt-3 h-4 w-1/2" />
-              <Skeleton className="mt-2 h-3 w-2/3" />
-              <Skeleton className="mt-2 h-3 w-2/3" />
+            <div
+              key={item}
+              className="flex w-full flex-col rounded-md pb-3 sm:mx-auto sm:max-w-5xl sm:flex-row sm:gap-8 sm:border sm:p-6"
+            >
+              <Skeleton className="aspect-[4/3] w-full rounded-md shadow-sm sm:h-fit sm:max-w-xs" />
+              <div className="w-full">
+                <Skeleton className="mt-3 h-5 w-2/3" />
+                <span className="mt-3 flex items-center justify-between text-lg">
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                </span>
+                <Skeleton className="mt-3 h-4 w-1/2" />
+                <Skeleton className="mt-2 h-3 w-2/3" />
+                <Skeleton className="mt-2 h-3 w-2/3" />
+              </div>
             </div>
           ))}
         {data
@@ -340,55 +354,62 @@ export default function Cars({
                   ease: "easeOut",
                 },
               }}
-              className="flex w-full flex-col pb-3 xl:mx-auto xl:max-w-5xl xl:flex-row xl:gap-8"
+              className="flex w-full flex-col rounded-md pb-3 sm:mx-auto sm:max-w-5xl sm:flex-row sm:gap-8 sm:border sm:p-6"
             >
               {/* Car image */}
-              <div
-                className={`${
-                  car.image
-                    ? ""
-                    : "bg-gradient bg-gradient-to-b from-gray-100 to-gray-200"
-                } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm xl:h-fit xl:max-w-sm`}
-              >
-                {car.image ? (
-                  <Image
-                    src={car.image}
-                    fill
-                    sizes="384px"
-                    className={`${
-                      car.isSold ? "brightness-90 saturate-0" : ""
-                    } object-cover transition-all duration-700 ease-in-out
+              <div className="flex w-full flex-col justify-between gap-6">
+                <div
+                  className={`${
+                    car.image
+                      ? ""
+                      : "bg-gradient bg-gradient-to-b from-gray-100 to-gray-200"
+                  } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm sm:h-fit sm:max-w-xs`}
+                >
+                  {car.image ? (
+                    <Image
+                      src={car.image}
+                      fill
+                      sizes="384px"
+                      className={`${
+                        car.isSold ? "brightness-90 saturate-0" : ""
+                      } object-cover transition-all duration-700 ease-in-out
+                        `}
+                      alt=""
+                    />
+                  ) : car.name === "Fox" ? (
+                    <Image
+                      src={"/fox.png"}
+                      fill
+                      sizes="360px"
+                      className="bg-white object-contain transition-all duration-700 ease-in-out"
+                      alt=""
+                    />
+                  ) : (
+                    <Image
+                      src={"/car-placeholder.png"}
+                      fill
+                      sizes="384px"
+                      className={`${
+                        car.isSold ? "brightness-90 saturate-0" : ""
+                      } object-cover transition-all duration-700 ease-in-out
                       `}
-                    alt=""
-                  />
-                ) : car.name === "Fox" ? (
-                  <Image
-                    src={"/fox.png"}
-                    fill
-                    sizes="360px"
-                    className="bg-white object-contain transition-all duration-700 ease-in-out"
-                    alt=""
-                  />
-                ) : (
-                  <Image
-                    src={"/car-placeholder.png"}
-                    fill
-                    sizes="384px"
-                    className={`${
-                      car.isSold ? "brightness-90 saturate-0" : ""
-                    } object-cover transition-all duration-700 ease-in-out
-                    `}
-                    alt=""
-                  />
+                      alt=""
+                    />
+                  )}
+                </div>
+                {car.seller && (
+                  <span className="hidden items-center gap-1 text-sm font-medium text-gray-400 sm:flex">
+                    {car.seller}
+                  </span>
                 )}
               </div>
               {/* Car info */}
-              <div className="xl:flex xl:w-full xl:flex-col xl:justify-between xl:gap-3">
+              <div className="sm:flex sm:w-full sm:flex-col sm:justify-between sm:gap-3">
                 <div>
                   <p
                     className={`${
                       car.isSold ? "line-through" : ""
-                    } mt-3 flex items-center justify-between text-xl font-semibold`}
+                    } mt-3 flex items-center justify-between text-xl font-semibold sm:mt-0`}
                   >
                     {car.name}, {car.year}
                     {/* Edit car info */}
@@ -453,7 +474,7 @@ export default function Cars({
                 )}
                 <div className="flex justify-between pt-6">
                   {car.seller && (
-                    <span className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <span className="flex items-center gap-1 text-sm font-medium text-gray-400 sm:hidden">
                       {car.seller}
                     </span>
                   )}
