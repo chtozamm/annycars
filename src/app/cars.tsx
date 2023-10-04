@@ -251,6 +251,13 @@ export default function Cars({
             {sellers.map((seller) => (
               <SelectItem key={seller} value={seller}>
                 {seller}
+                {" ("}
+                {
+                  data.filter(
+                    (car: Car) => car.seller === seller && !car.isSold,
+                  ).length
+                }
+                {")"}
               </SelectItem>
             ))}
           </SelectContent>
