@@ -328,7 +328,7 @@ export default function Cars({
                   car.image
                     ? ""
                     : "bg-gradient bg-gradient-to-b from-gray-100 to-gray-200"
-                } relative aspect-[8/5] w-full select-none overflow-hidden rounded-md shadow-sm`}
+                } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm`}
               >
                 {car.image ? (
                   <Image
