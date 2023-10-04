@@ -282,7 +282,7 @@ export default function Cars({
         </Button>
       </div>
       {/* List of cars */}
-      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm xs:grid-cols-2 md:mt-14  md:grid-cols-3 md:gap-16 xl:grid-cols-4">
+      <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm xs:grid-cols-2 md:mt-14 md:grid-cols-3 md:gap-16  xl:flex xl:flex-col">
         {isLoading &&
           [1, 2, 3, 4].map((item) => (
             <div key={item} className="flex w-full flex-col pb-3">
@@ -321,14 +321,14 @@ export default function Cars({
                 },
               }}
               key={car.id}
-              className="flex w-full flex-col pb-3"
+              className="flex w-full flex-col pb-3 xl:grid xl:grid-cols-2"
             >
               <div
                 className={`${
                   car.image
                     ? ""
                     : "bg-gradient bg-gradient-to-b from-gray-100 to-gray-200"
-                } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm`}
+                } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm xl:max-w-sm`}
               >
                 {car.image ? (
                   <Image
