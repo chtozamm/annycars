@@ -93,12 +93,12 @@ export default async function Home() {
           end=", чтобы управлять объявлениями."
         />
       )}
-      <header
-        className={`flex h-20 cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold`}
+      {/* <header
+        className={`flex h-20 w-full cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold`}
       >
         <TriangleIcon />
         annycars
-      </header>
+      </header> */}
       <Cars
         addCar={addCar}
         deleteCar={deleteCar}

@@ -6,7 +6,16 @@ import { motion } from "framer-motion";
 import { AddCarForm, UpdateCarForm } from "./forms";
 import useSWR from "swr";
 
-import ExternalLink from "@/components/externalLink";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -26,11 +35,11 @@ import {
   XIcon,
   GridIcon,
   ListIcon,
+  TriangleIcon,
 } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Switch } from "@/components/ui/switch";
 
 export default function Cars({
   serverCars,
@@ -178,9 +187,15 @@ export default function Cars({
     }
   }, [filter, router, searchParams, createQueryString, pathname]);
   return (
-    <>
+    <div className="w-full max-w-md xl:flex xl:w-full xl:gap-8">
       {/* Container for actions */}
-      <div className="flex w-full max-w-md flex-col gap-3">
+      <div className="flex w-full flex-col gap-3 xl:fixed xl:inset-8 xl:w-1/4 xl:max-w-sm">
+        <header
+          className={`flex h-20 w-full cursor-default select-none items-center justify-center gap-1.5 text-2xl font-semibold`}
+        >
+          <TriangleIcon />
+          annycars
+        </header>
         {/* Fun mode */}
         {/* {session.data && (
           <div className="mx-auto mb-3 flex w-fit select-none items-center gap-1.5">
@@ -354,9 +369,9 @@ export default function Cars({
           display === "list"
             ? "sm:flex sm:max-w-3xl sm:flex-col"
             : display === "grid"
-            ? "justify-items-center sm:grid-cols-2 md:gap-16 lg:max-w-7xl lg:grid-cols-3 xl:grid-cols-4"
+            ? "justify-items-center sm:grid-cols-2 md:gap-16 lg:max-w-7xl lg:grid-cols-3 xl:grid-cols-3"
             : ""
-        } mx-auto mt-8 grid w-full max-w-md grid-flow-row auto-rows-max gap-8 text-sm sm:max-w-3xl`}
+        } mx-auto mt-8 grid  w-full max-w-md grid-flow-row auto-rows-max gap-8 text-sm sm:max-w-3xl xl:ml-auto xl:mr-0 xl:w-3/4`}
       >
         {isLoading &&
           [1, 2, 3, 4].map((item) => (
@@ -404,7 +419,7 @@ export default function Cars({
               className={`${
                 display === "grid"
                   ? "flex w-full flex-col pb-3 sm:max-w-xs"
-                  : "sm:mx-auto sm:max-w-5xl sm:flex-row sm:gap-8 sm:border sm:p-6"
+                  : "sm:mx-auto sm:max-w-5xl sm:flex-row sm:gap-8 sm:p-6"
               } flex w-full flex-col rounded-md pb-3`}
             >
               {/* Car image */}
@@ -414,7 +429,9 @@ export default function Cars({
                     car.image
                       ? ""
                       : "bg-gradient bg-gradient-to-b from-gray-100 to-gray-200"
-                  } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm sm:h-fit sm:max-w-xs`}
+                  } relative w-full select-none overflow-hidden rounded-md shadow-sm sm:h-fit sm:max-w-xs ${
+                    display === "grid" ? "aspect-[3/2]" : "aspect-[4/3]"
+                  }`}
                 >
                   {car.image ? (
                     <Image
@@ -457,23 +474,60 @@ export default function Cars({
               {/* Car info */}
               <div className="sm:flex sm:w-full sm:flex-col sm:justify-between sm:gap-3">
                 <div>
-                  <p
-                    className={`${
-                      car.isSold ? "line-through" : ""
-                    } mt-3 flex items-center justify-between text-xl font-semibold ${
-                      display !== "grid" && "sm:mt-0"
-                    }`}
-                  >
-                    {car.name}, {car.year}
+                  <div className="mt-3 flex w-full items-center justify-between">
+                    {car.link ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger className="w-fit select-text rounded-sm text-black transition-colors duration-150 ease-in-out  focus-visible:text-zinc-700  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2">
+                          <p
+                            className={`${
+                              car.isSold ? "line-through" : ""
+                            } flex items-center justify-between text-xl font-semibold hover:text-gray-600 ${
+                              display !== "grid" && "sm:mt-0"
+                            }`}
+                          >
+                            {car.name}, {car.year}
+                          </p>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Перейти к объявлению?
+                            </AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Отмена</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => window.open(car.link, "_blank")}
+                            >
+                              Перейти
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <p
+                        className={`${
+                          car.isSold ? "line-through" : ""
+                        } flex items-center justify-between text-xl font-semibold ${
+                          display !== "grid" && "sm:mt-0"
+                        }`}
+                      >
+                        {car.name}, {car.year}
+                      </p>
+                    )}
+
                     {/* Edit car info */}
                     {session.data && (
-                      <UpdateCarForm
-                        car={car}
-                        handleDelete={handleDelete}
-                        handleUpdate={handleUpdate}
-                      />
+                      <p>
+                        <UpdateCarForm
+                          car={car}
+                          handleDelete={handleDelete}
+                          handleUpdate={handleUpdate}
+                        />
+                      </p>
                     )}
-                  </p>
+                  </div>
+
                   <p className="w-full border-b pb-1"></p>
                   <p className="mt-1.5 flex items-center justify-between text-lg">
                     {car.price &&
@@ -535,16 +589,16 @@ export default function Cars({
                       {car.seller}
                     </span>
                   )}
-                  {car.link && (
+                  {/* {car.link && (
                     <span className="ml-auto pl-1.5">
                       <ExternalLink url={car.link} />
                     </span>
-                  )}
+                  )} */}
                 </div>
               </div>
             </motion.li>
           ))}
       </ul>
-    </>
+    </div>
   );
 }
