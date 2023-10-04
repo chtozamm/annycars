@@ -481,7 +481,7 @@ export default function Cars({
                 <div>
                   <div
                     className={`mt-3 flex w-full items-center justify-between sm:mt-0 ${
-                      display !== "list" && "sm:mt-3"
+                      display === "grid" && "sm:mt-3"
                     }`}
                   >
                     {car.link ? (
