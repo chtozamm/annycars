@@ -24,6 +24,8 @@ import {
   SearchIcon,
   SortIcon,
   XIcon,
+  GridIcon,
+  ListIcon,
 } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -68,6 +70,7 @@ export default function Cars({
   const sort = searchParams.get("sort") ?? "";
   const [searchQuery, setSearchQuery] = useState("");
   const sold = searchParams.get("sold") ?? "";
+  const display = searchParams.get("display") ?? "";
   // const [showPersonal, setShowPersonal] = useState(false);
 
   const amountOfShownCars = data
@@ -308,9 +311,51 @@ export default function Cars({
             ? `Показано ${amountOfShownCars} автомобиля`
             : `Показано ${amountOfShownCars} автомобилей`}
         </p>
+        {/* Display grid/list */}
+        <div className="mt-3 hidden w-full sm:block">
+          <p className="text-center text-sm font-medium">Вид:</p>
+          <div className="mt-3 hidden w-full justify-center gap-3 sm:flex">
+            <Button
+              variant="outline"
+              disabled={display !== "grid"}
+              onClick={() =>
+                router.push(
+                  pathname + "?" + createQueryString("display", "list"),
+                  {
+                    scroll: false,
+                  },
+                )
+              }
+            >
+              <ListIcon />
+            </Button>
+            <Button
+              variant="outline"
+              disabled={display === "grid"}
+              onClick={() =>
+                router.push(
+                  pathname + "?" + createQueryString("display", "grid"),
+                  {
+                    scroll: false,
+                  },
+                )
+              }
+            >
+              <GridIcon />
+            </Button>
+          </div>
+        </div>
       </div>
       {/* List of cars */}
-      <ul className="mx-auto mt-8 grid w-full max-w-md grid-flow-row auto-rows-max gap-8 text-sm sm:flex sm:max-w-3xl sm:flex-col">
+      <ul
+        className={`${
+          display === "list"
+            ? "sm:flex sm:max-w-3xl sm:flex-col"
+            : display === "grid"
+            ? "justify-items-center sm:grid-cols-2 md:gap-16 lg:max-w-7xl lg:grid-cols-3 xl:grid-cols-4"
+            : ""
+        } mx-auto mt-8 grid w-full max-w-md grid-flow-row auto-rows-max gap-8 text-sm sm:max-w-3xl`}
+      >
         {isLoading &&
           [1, 2, 3, 4].map((item) => (
             <div
@@ -354,7 +399,11 @@ export default function Cars({
                   ease: "easeOut",
                 },
               }}
-              className="flex w-full flex-col rounded-md pb-3 sm:mx-auto sm:max-w-5xl sm:flex-row sm:gap-8 sm:border sm:p-6"
+              className={`${
+                display === "grid"
+                  ? "flex w-full flex-col pb-3 sm:max-w-xs"
+                  : "sm:mx-auto sm:max-w-5xl sm:flex-row sm:gap-8 sm:border sm:p-6"
+              } flex w-full flex-col rounded-md pb-3`}
             >
               {/* Car image */}
               <div className="flex w-full flex-col justify-between gap-6">
@@ -397,7 +446,7 @@ export default function Cars({
                     />
                   )}
                 </div>
-                {car.seller && (
+                {car.seller && display !== "grid" && (
                   <span className="hidden items-center gap-1 text-sm font-medium text-gray-400 sm:flex">
                     {car.seller}
                   </span>
@@ -409,7 +458,9 @@ export default function Cars({
                   <p
                     className={`${
                       car.isSold ? "line-through" : ""
-                    } mt-3 flex items-center justify-between text-xl font-semibold sm:mt-0`}
+                    } mt-3 flex items-center justify-between text-xl font-semibold ${
+                      display !== "grid" && "sm:mt-0"
+                    }`}
                   >
                     {car.name}, {car.year}
                     {/* Edit car info */}
@@ -474,12 +525,16 @@ export default function Cars({
                 )}
                 <div className="flex justify-between pt-6">
                   {car.seller && (
-                    <span className="flex items-center gap-1 text-sm font-medium text-gray-400 sm:hidden">
+                    <span
+                      className={`${
+                        display !== "grid" && "sm:hidden"
+                      } flex items-center gap-1 text-sm font-medium text-gray-400`}
+                    >
                       {car.seller}
                     </span>
                   )}
                   {car.link && (
-                    <span className="ml-auto">
+                    <span className="ml-auto pl-1.5">
                       <ExternalLink url={car.link} />
                     </span>
                   )}
