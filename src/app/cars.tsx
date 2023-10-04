@@ -70,6 +70,15 @@ export default function Cars({
   const sold = searchParams.get("sold") ?? "";
   // const [showPersonal, setShowPersonal] = useState(false);
 
+  const amountOfShownCars = data
+    ?.filter((car) => (filter !== "all" ? car.seller === filter : true))
+    ?.filter((car) => (sold === "true" ? true : !car.isSold))
+    ?.filter((car) => (sort ? !car.personal : true))
+    ?.filter(
+      (car) =>
+        car.name?.toLocaleLowerCase()?.includes(searchQuery?.toLowerCase()),
+    ).length;
+
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
@@ -280,6 +289,16 @@ export default function Cars({
         >
           Сбросить фильтры
         </Button>
+        <p className="mt-3 text-center">
+          {amountOfShownCars}{" "}
+          {amountOfShownCars === 0
+            ? "Нет автомобилей, удовлетворяющих выбранные фильтры"
+            : amountOfShownCars === 1
+            ? "автомобиль"
+            : amountOfShownCars === 2 || amountOfShownCars === 3
+            ? "автомобиля"
+            : "автомобилей"}
+        </p>
       </div>
       {/* List of cars */}
       <ul className="mx-auto mt-8 grid w-full max-w-7xl grid-flow-row auto-rows-max gap-8 text-sm xs:grid-cols-2 md:mt-14 md:grid-cols-3 md:gap-16  xl:flex xl:flex-col">
