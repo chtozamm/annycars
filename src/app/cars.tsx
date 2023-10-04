@@ -311,6 +311,7 @@ export default function Cars({
           // ?.filter((car) => (!showPersonal ? !car.personal : true))
           ?.map((car: any) => (
             <motion.li
+              key={car.id}
               initial={{ opacity: 0 }}
               animate={{
                 opacity: 1,
@@ -320,15 +321,15 @@ export default function Cars({
                   ease: "easeOut",
                 },
               }}
-              key={car.id}
-              className="flex w-full flex-col pb-3 xl:grid xl:grid-cols-2"
+              className="flex w-full flex-col pb-3 xl:mx-auto xl:max-w-5xl xl:flex-row xl:gap-8"
             >
+              {/* Car image */}
               <div
                 className={`${
                   car.image
                     ? ""
                     : "bg-gradient bg-gradient-to-b from-gray-100 to-gray-200"
-                } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm xl:max-w-sm`}
+                } relative aspect-[4/3] w-full select-none overflow-hidden rounded-md shadow-sm xl:h-fit xl:max-w-sm`}
               >
                 {car.image ? (
                   <Image
@@ -338,7 +339,7 @@ export default function Cars({
                     className={`${
                       car.isSold ? "brightness-90 saturate-0" : ""
                     } object-cover transition-all duration-700 ease-in-out
-                    `}
+                      `}
                     alt=""
                   />
                 ) : car.name === "Fox" ? (
@@ -356,86 +357,93 @@ export default function Cars({
                     sizes="384px"
                     className={`${
                       car.isSold ? "brightness-90 saturate-0" : ""
-                    } object-cover transition-all duration-700 ease-in-out 
-                  `}
+                    } object-cover transition-all duration-700 ease-in-out
+                    `}
                     alt=""
                   />
                 )}
               </div>
-              <p
-                className={`${
-                  car.isSold ? "line-through" : ""
-                } mt-3 flex items-center justify-between text-xl font-semibold`}
-              >
-                {car.name}, {car.year}
-                {/* Edit car info */}
-                {session.data && (
-                  <UpdateCarForm
-                    car={car}
-                    handleDelete={handleDelete}
-                    handleUpdate={handleUpdate}
-                  />
-                )}
-              </p>
-              <p className="w-full border-b pb-1"></p>
-              <p className="mt-1.5 flex items-center justify-between text-lg">
-                {car.price &&
-                  (isNaN(car.price.replace(" ", ""))
-                    ? car.price
-                    : car.price + " ₽")}
-                {car.mileage && (
-                  <span className="ml-auto text-sm text-gray-600">
-                    {car.mileage} км
-                  </span>
-                )}
-              </p>
-              {(car.advantages || car.disadvantages) && (
-                <div className="mt-3 grid grid-cols-1 gap-6">
-                  {/* Advantages */}
-                  {car.advantages && (
-                    <div>
-                      <span className="text-base font-medium">
-                        Преимущества
+              {/* Car info */}
+              <div className="xl:flex xl:w-full xl:flex-col xl:justify-between xl:gap-3">
+                <div>
+                  <p
+                    className={`${
+                      car.isSold ? "line-through" : ""
+                    } mt-3 flex items-center justify-between text-xl font-semibold`}
+                  >
+                    {car.name}, {car.year}
+                    {/* Edit car info */}
+                    {session.data && (
+                      <UpdateCarForm
+                        car={car}
+                        handleDelete={handleDelete}
+                        handleUpdate={handleUpdate}
+                      />
+                    )}
+                  </p>
+                  <p className="w-full border-b pb-1"></p>
+                  <p className="mt-1.5 flex items-center justify-between text-lg">
+                    {car.price &&
+                      (isNaN(car.price.replace(" ", ""))
+                        ? car.price
+                        : car.price + " ₽")}
+                    {car.mileage && (
+                      <span className="ml-auto text-sm text-gray-600">
+                        {car.mileage} км
                       </span>
-                      <p className="flex flex-col">
-                        {car.advantages &&
-                          car.advantages.split(",").map((item: string) => (
-                            <span key={item} className="flex gap-1.5">
-                              <PlusIcon />
-                              {item.trim()}
-                            </span>
-                          ))}
-                      </p>
-                    </div>
+                    )}
+                  </p>
+                </div>
+                {(car.advantages || car.disadvantages) && (
+                  <div className="mt-3 grid grid-cols-1 gap-6">
+                    {/* Advantages */}
+                    {car.advantages && (
+                      <div>
+                        <span className="text-base font-medium">
+                          Преимущества
+                        </span>
+                        <p className="flex flex-col">
+                          {car.advantages &&
+                            car.advantages.split(",").map((item: string) => (
+                              <span key={item} className="flex gap-1.5">
+                                <PlusIcon />
+                                {item.trim()}
+                              </span>
+                            ))}
+                        </p>
+                      </div>
+                    )}
+                    {/* Disadvantages */}
+                    {car.disadvantages && (
+                      <div>
+                        <span className="text-base font-medium">
+                          Недостатки
+                        </span>
+                        <p className="flex flex-col">
+                          {car.disadvantages &&
+                            car.disadvantages.split(",").map((item: string) => (
+                              <span key={item} className="flex gap-1.5">
+                                <MinusIcon />
+                                {item.trim()}
+                              </span>
+                            ))}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="flex justify-between pt-6">
+                  {car.seller && (
+                    <span className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                      {car.seller}
+                    </span>
                   )}
-                  {/* Disadvantages */}
-                  {car.disadvantages && (
-                    <div>
-                      <span className="text-base font-medium">Недостатки</span>
-                      <p className="flex flex-col">
-                        {car.disadvantages &&
-                          car.disadvantages.split(",").map((item: string) => (
-                            <span key={item} className="flex gap-1.5">
-                              <MinusIcon />
-                              {item.trim()}
-                            </span>
-                          ))}
-                      </p>
-                    </div>
+                  {car.link && (
+                    <span className="ml-auto">
+                      <ExternalLink url={car.link} />
+                    </span>
                   )}
                 </div>
-              )}
-              <div className="flex justify-between pt-6">
-                {car.seller && (
-                  <span className="flex items-center gap-1 text-sm font-medium text-gray-400">
-                    {car.seller}
-                  </span>
-                )}
-                {car.link && (
-                  <span className="ml-auto">
-                    <ExternalLink url={car.link} />
-                  </span>
-                )}
               </div>
             </motion.li>
           ))}
