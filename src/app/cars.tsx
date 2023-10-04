@@ -77,6 +77,7 @@ export default function Cars({
   // Filters and sort key
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter") ?? "all";
+  const model = searchParams.get("model") ?? "all";
   const sort = searchParams.get("sort") ?? "";
   const [searchQuery, setSearchQuery] = useState("");
   const sold = searchParams.get("sold") ?? "";
@@ -115,10 +116,24 @@ export default function Cars({
       .forEach((car: Car) => sellersSet.add(car.seller));
     // }
   }
+
   const sellers: string[] = [];
   sellersSet.forEach((seller) => sellers.push(seller as string));
   sellers.sort();
   sellersSet.clear();
+
+  const carsSet = new Set();
+  if (sold === "true") {
+    data.forEach((car: Car) => carsSet.add(car.name));
+  } else {
+    data
+      .filter((car) => !car.isSold)
+      .forEach((car: Car) => carsSet.add(car.name));
+  }
+  const models: string[] = [];
+  carsSet.forEach((model) => models.push(model as string));
+  models.sort();
+  carsSet.clear();
 
   function sortCars(a: Car, b: Car, key: string) {
     switch (key) {
@@ -206,7 +221,7 @@ export default function Cars({
         {/* Add new car */}
         {session.data && <AddCarForm handleAdd={handleAdd} />}
         {/* Search */}
-        <div
+        {/* <div
           className={`${
             session.data && "mt-3"
           } relative flex h-fit w-full items-center`}
@@ -229,7 +244,38 @@ export default function Cars({
               <XIcon />
             </button>
           )}
-        </div>
+        </div> */}
+        {/* Filter by model */}
+        <Select
+          value={model || "all"}
+          onValueChange={(value) =>
+            router.push(pathname + "?" + createQueryString("model", value), {
+              scroll: false,
+            })
+          }
+        >
+          <SelectTrigger className="relative w-full pl-9">
+            <FilterIcon />
+            <SelectValue
+              placeholder="Выбрать автомобиль"
+              className="placeholder:text-gray-400"
+            />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Все автомобили</SelectItem>
+            {models.map((model: string) => (
+              <SelectItem key={model} value={model}>
+                {model}
+                {" ("}
+                {
+                  data.filter((car: Car) => car.name === model && !car.isSold)
+                    .length
+                }
+                {")"}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {/* Filter by seller */}
         <Select
           value={filter || "all"}
@@ -248,18 +294,53 @@ export default function Cars({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Все продавцы</SelectItem>
-            {sellers.map((seller) => (
-              <SelectItem key={seller} value={seller}>
-                {seller}
-                {" ("}
-                {
-                  data.filter(
-                    (car: Car) => car.seller === seller && !car.isSold,
-                  ).length
-                }
-                {")"}
-              </SelectItem>
-            ))}
+            {sellers.map((seller) => {
+              if (!model || model === "all")
+                return (
+                  <SelectItem key={seller} value={seller}>
+                    {seller}
+                    {" ("}
+                    {
+                      data.filter((car: Car) => {
+                        if (!model || model === "all")
+                          return car.seller === seller && !car.isSold;
+                        return (
+                          car.name === model &&
+                          car.seller === seller &&
+                          !car.isSold
+                        );
+                      }).length
+                    }
+                    {")"}
+                  </SelectItem>
+                );
+              if (
+                data.filter((car: Car) => {
+                  if (!model) return car.seller === seller && !car.isSold;
+                  return (
+                    car.name === model && car.seller === seller && !car.isSold
+                  );
+                }).length
+              ) {
+                return (
+                  <SelectItem key={seller} value={seller}>
+                    {seller}
+                    {" ("}
+                    {
+                      data.filter((car: Car) => {
+                        if (!model) return car.seller === seller && !car.isSold;
+                        return (
+                          car.name === model &&
+                          car.seller === seller &&
+                          !car.isSold
+                        );
+                      }).length
+                    }
+                    {")"}
+                  </SelectItem>
+                );
+              }
+            })}
           </SelectContent>
         </Select>
         {/* Sort cars */}
@@ -396,6 +477,7 @@ export default function Cars({
           ))}
         {data
           ?.filter((car) => (filter !== "all" ? car.seller === filter : true))
+          ?.filter((car) => (model !== "all" ? car.name === model : true))
           ?.filter((car) => (sold === "true" ? true : !car.isSold))
           ?.filter((car) => (sort ? !car.personal : true))
           ?.filter(
