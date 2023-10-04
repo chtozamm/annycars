@@ -171,12 +171,12 @@ export default function Cars({
   }
 
   useEffect(() => {
-    if (searchParams.get("filter") === "🦊🐺") {
-      router.replace("/?filter=🦊🐺", {
+    if (searchParams.get("filter") === "🦊🐺" && searchParams.get("sort")) {
+      router.push(pathname + "?" + createQueryString("sort", ""), {
         scroll: false,
       });
     }
-  }, [filter, router, searchParams]);
+  }, [filter, router, searchParams, createQueryString, pathname]);
   return (
     <>
       {/* Container for actions */}
