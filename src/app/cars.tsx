@@ -248,6 +248,7 @@ export default function Cars({
         {/* Sort cars */}
         <Select
           value={sort || "created_at"}
+          disabled={filter === "🦊🐺"}
           onValueChange={(value) => {
             router.push(pathname + "?" + createQueryString("sort", value), {
               scroll: false,
@@ -274,6 +275,7 @@ export default function Cars({
             className="w-fit accent-black"
             type="checkbox"
             checked={sold === "true"}
+            disabled={filter === "🦊🐺"}
             onChange={() =>
               router.push(
                 pathname +
