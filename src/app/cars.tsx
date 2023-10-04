@@ -304,7 +304,7 @@ export default function Cars({
             ? "Нет автомобилей, удовлетворяющих выбранные фильтры"
             : amountOfShownCars === 1
             ? "Показан 1 автомобиль"
-            : amountOfShownCars === 2 || amountOfShownCars === 3
+            : amountOfShownCars > 1 && amountOfShownCars < 5
             ? `Показано ${amountOfShownCars} автомобиля`
             : `Показано ${amountOfShownCars} автомобилей`}
         </p>
