@@ -8,6 +8,16 @@ import useSWR from "swr";
 
 import ExternalLink from "@/components/externalLink";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -449,31 +459,83 @@ export default function Cars({
                   )}
                 </div>
                 {car.seller && display !== "grid" && (
-                  <span className="hidden items-center gap-1 text-sm font-medium text-gray-400 sm:flex">
+                  <button
+                    onClick={() => {
+                      router.push(
+                        pathname +
+                          "?" +
+                          createQueryString("filter", car.seller),
+                        {
+                          scroll: false,
+                        },
+                      );
+                    }}
+                    className="hidden items-center gap-1 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-300 sm:flex"
+                  >
                     {car.seller}
-                  </span>
+                  </button>
                 )}
               </div>
               {/* Car info */}
               <div className="sm:flex sm:w-full sm:flex-col sm:justify-between sm:gap-3">
                 <div>
-                  <p
-                    className={`${
-                      car.isSold ? "line-through" : ""
-                    } mt-3 flex items-center justify-between text-xl font-semibold ${
-                      display !== "grid" && "sm:mt-0"
+                  <div
+                    className={`mt-3 flex w-full items-center justify-between sm:mt-0 ${
+                      display !== "list" && "sm:mt-3"
                     }`}
                   >
-                    {car.name}, {car.year}
+                    {car.link ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger className="w-fit select-text rounded-sm text-black transition-colors duration-150 ease-in-out  focus-visible:text-zinc-700  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2">
+                          <p
+                            className={`${
+                              car.isSold ? "line-through" : ""
+                            } flex items-center justify-between text-xl font-semibold hover:text-gray-600 ${
+                              display !== "grid" && "sm:mt-0"
+                            }`}
+                          >
+                            {car.name}, {car.year}
+                          </p>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Перейти к объявлению?
+                            </AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Отмена</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => window.open(car.link, "_blank")}
+                            >
+                              Перейти
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <p
+                        className={`${
+                          car.isSold ? "line-through" : ""
+                        } flex items-center justify-between text-xl font-semibold ${
+                          display !== "grid" && "sm:mt-0"
+                        }`}
+                      >
+                        {car.name}, {car.year}
+                      </p>
+                    )}
+
                     {/* Edit car info */}
                     {session.data && (
-                      <UpdateCarForm
-                        car={car}
-                        handleDelete={handleDelete}
-                        handleUpdate={handleUpdate}
-                      />
+                      <p>
+                        <UpdateCarForm
+                          car={car}
+                          handleDelete={handleDelete}
+                          handleUpdate={handleUpdate}
+                        />
+                      </p>
                     )}
-                  </p>
+                  </div>
                   <p className="w-full border-b pb-1"></p>
                   <p className="mt-1.5 flex items-center justify-between text-lg">
                     {car.price &&
@@ -527,19 +589,29 @@ export default function Cars({
                 )}
                 <div className="flex justify-between pt-6">
                   {car.seller && (
-                    <span
+                    <button
+                      onClick={() =>
+                        router.push(
+                          pathname +
+                            "?" +
+                            createQueryString("filter", car.seller),
+                          {
+                            scroll: false,
+                          },
+                        )
+                      }
                       className={`${
                         display !== "grid" && "sm:hidden"
-                      } flex items-center gap-1 text-sm font-medium text-gray-400`}
+                      } flex items-center gap-1 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-300`}
                     >
                       {car.seller}
-                    </span>
+                    </button>
                   )}
-                  {car.link && (
+                  {/* {car.link && (
                     <span className="ml-auto pl-1.5">
                       <ExternalLink url={car.link} />
                     </span>
-                  )}
+                  )} */}
                 </div>
               </div>
             </motion.li>
