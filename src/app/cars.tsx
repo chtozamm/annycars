@@ -1,12 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { AddCarForm, UpdateCarForm } from "./forms";
 import useSWR from "swr";
 
-import ExternalLink from "@/components/externalLink";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,16 +30,13 @@ import {
   FilterIcon,
   PlusIcon,
   MinusIcon,
-  SearchIcon,
   SortIcon,
-  XIcon,
   GridIcon,
   ListIcon,
 } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Switch } from "@/components/ui/switch";
 
 export default function Cars({
   serverCars,
@@ -76,45 +72,33 @@ export default function Cars({
   const pathname = usePathname();
   // Filters and sort key
   const searchParams = useSearchParams();
-  const filter = searchParams.get("filter") ?? "all";
+  const seller = searchParams.get("seller") ?? "all";
   const model = searchParams.get("model") ?? "all";
   const sort = searchParams.get("sort") ?? "";
-  const [searchQuery, setSearchQuery] = useState("");
   const sold = searchParams.get("sold") ?? "";
   const display = searchParams.get("display") ?? "";
-  // const [showPersonal, setShowPersonal] = useState(false);
 
   const amountOfShownCars = data
-    ?.filter((car) => (filter !== "all" ? car.seller === filter : true))
-    ?.filter((car) => (sold === "true" ? true : !car.isSold))
-    ?.filter((car) => (sort ? !car.personal : true))
-    ?.filter(
-      (car) =>
-        car.name?.toLocaleLowerCase()?.includes(searchQuery?.toLowerCase()),
-    ).length;
+    ?.filter((car) =>
+      seller !== "all"
+        ? model !== "all"
+          ? car.seller === seller && car.name === model
+          : car.seller === seller
+        : model !== "all"
+        ? car.name === model
+        : true,
+    )
+    ?.filter((car) => (sold === "true" ? true : !car.isSold)).length;
 
   // Creates set and converts to array with unique sellers
   // Used for filtering cars
   const sellersSet = new Set();
   if (sold === "true") {
-    // if (!showPersonal) {
-    //   data
-    //     .filter((car) => !car.personal)
-    //     .forEach((car: Car) => sellersSet.add(car.seller));
-    // } else {
     data.forEach((car: Car) => sellersSet.add(car.seller));
-    // }
   } else {
-    // if (!showPersonal) {
-    //   data
-    //     .filter((car) => !car.personal)
-    //     .filter((car) => !car.isSold)
-    //     .forEach((car: Car) => sellersSet.add(car.seller));
-    // } else {
     data
       .filter((car) => !car.isSold)
       .forEach((car: Car) => sellersSet.add(car.seller));
-    // }
   }
 
   const sellers: string[] = [];
@@ -170,7 +154,6 @@ export default function Cars({
   );
 
   function resetFilters() {
-    setSearchQuery("");
     router.push("/", { scroll: false });
   }
 
@@ -195,56 +178,12 @@ export default function Cars({
     });
   }
 
-  useEffect(() => {
-    if (searchParams.get("filter") === "🦊🐺" && searchParams.get("sort")) {
-      router.push(pathname + "?" + createQueryString("sort", ""), {
-        scroll: false,
-      });
-    }
-  }, [filter, router, searchParams, createQueryString, pathname]);
   return (
     <>
       {/* Container for actions */}
       <div className="flex w-full max-w-md flex-col gap-3">
-        {/* Fun mode */}
-        {/* {session.data && (
-          <div className="mx-auto mb-3 flex w-fit select-none items-center gap-1.5">
-            <Label htmlFor="show-personal">Fun mode</Label>
-            <Switch
-              id="show-personal"
-              className="accent-black"
-              checked={showPersonal}
-              onCheckedChange={() => setShowPersonal(!showPersonal)}
-            />
-          </div>
-        )} */}
         {/* Add new car */}
         {session.data && <AddCarForm handleAdd={handleAdd} />}
-        {/* Search */}
-        {/* <div
-          className={`${
-            session.data && "mt-3"
-          } relative flex h-fit w-full items-center`}
-        >
-          <Input
-            type="text"
-            value={searchQuery}
-            placeholder="Поиск по названию"
-            className="w-full pl-9"
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
-          />
-          <SearchIcon />
-          {searchQuery && (
-            <button
-              className="absolute right-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-zinc-950 dark:focus-visible:ring-zinc-300"
-              onClick={() => setSearchQuery("")}
-            >
-              <XIcon />
-            </button>
-          )}
-        </div> */}
         {/* Filter by model */}
         <Select
           value={model || "all"}
@@ -266,21 +205,15 @@ export default function Cars({
             {models.map((model: string) => (
               <SelectItem key={model} value={model}>
                 {model}
-                {" ("}
-                {
-                  data.filter((car: Car) => car.name === model && !car.isSold)
-                    .length
-                }
-                {")"}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         {/* Filter by seller */}
         <Select
-          value={filter || "all"}
+          value={seller || "all"}
           onValueChange={(value) =>
-            router.push(pathname + "?" + createQueryString("filter", value), {
+            router.push(pathname + "?" + createQueryString("seller", value), {
               scroll: false,
             })
           }
@@ -295,58 +228,31 @@ export default function Cars({
           <SelectContent>
             <SelectItem value="all">Все продавцы</SelectItem>
             {sellers.map((seller) => {
-              if (!model || model === "all")
-                return (
-                  <SelectItem key={seller} value={seller}>
-                    {seller}
-                    {" ("}
-                    {
-                      data.filter((car: Car) => {
+              return (
+                <SelectItem key={seller} value={seller}>
+                  {seller}
+                  {" ("}
+                  {
+                    data
+                      .filter((car: Car) => {
                         if (!model || model === "all")
-                          return car.seller === seller && !car.isSold;
-                        return (
-                          car.name === model &&
-                          car.seller === seller &&
-                          !car.isSold
-                        );
-                      }).length
-                    }
-                    {")"}
-                  </SelectItem>
-                );
-              if (
-                data.filter((car: Car) => {
-                  if (!model) return car.seller === seller && !car.isSold;
-                  return (
-                    car.name === model && car.seller === seller && !car.isSold
-                  );
-                }).length
-              ) {
-                return (
-                  <SelectItem key={seller} value={seller}>
-                    {seller}
-                    {" ("}
-                    {
-                      data.filter((car: Car) => {
-                        if (!model) return car.seller === seller && !car.isSold;
-                        return (
-                          car.name === model &&
-                          car.seller === seller &&
-                          !car.isSold
-                        );
-                      }).length
-                    }
-                    {")"}
-                  </SelectItem>
-                );
-              }
+                          return car.seller === seller;
+                        return car.name === model && car.seller === seller;
+                      })
+                      .filter((car: Car) =>
+                        sold === "true" ? true : !car.isSold,
+                      ).length
+                  }
+                  {")"}
+                </SelectItem>
+              );
             })}
           </SelectContent>
         </Select>
         {/* Sort cars */}
         <Select
           value={sort || "created_at"}
-          disabled={filter === "🦊🐺"}
+          disabled={seller === "🦊🐺"}
           onValueChange={(value) => {
             router.push(pathname + "?" + createQueryString("sort", value), {
               scroll: false,
@@ -373,7 +279,7 @@ export default function Cars({
             className="w-fit accent-black"
             type="checkbox"
             checked={sold === "true"}
-            disabled={filter === "🦊🐺"}
+            disabled={seller === "🦊🐺"}
             onChange={() =>
               router.push(
                 pathname +
@@ -476,18 +382,17 @@ export default function Cars({
             </div>
           ))}
         {data
-          ?.filter((car) => (filter !== "all" ? car.seller === filter : true))
-          ?.filter((car) => (model !== "all" ? car.name === model : true))
-          ?.filter((car) => (sold === "true" ? true : !car.isSold))
-          ?.filter((car) => (sort ? !car.personal : true))
-          ?.filter(
-            (car) =>
-              car.name
-                ?.toLocaleLowerCase()
-                ?.includes(searchQuery?.toLowerCase()),
+          ?.filter((car) =>
+            seller !== "all"
+              ? model !== "all"
+                ? car.seller === seller && car.name === model
+                : car.seller === seller
+              : model !== "all"
+              ? car.name === model
+              : true,
           )
+          ?.filter((car) => (sold === "true" ? true : !car.isSold))
           ?.sort((a, b) => sortCars(a, b, sort))
-          // ?.filter((car) => (!showPersonal ? !car.personal : true))
           ?.map((car: any) => (
             <motion.li
               key={car.id}
@@ -553,7 +458,7 @@ export default function Cars({
                       router.push(
                         pathname +
                           "?" +
-                          createQueryString("filter", car.seller),
+                          createQueryString("seller", car.seller),
                         {
                           scroll: false,
                         },
@@ -696,11 +601,6 @@ export default function Cars({
                       {car.seller}
                     </button>
                   )}
-                  {/* {car.link && (
-                    <span className="ml-auto pl-1.5">
-                      <ExternalLink url={car.link} />
-                    </span>
-                  )} */}
                 </div>
               </div>
             </motion.li>
